@@ -1,0 +1,24 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 20 } %>
+  timeout: 5000
+  host: localhost
+
+  username: <%= ENV['PG_USER'] %>
+  password: <%= ENV['PG_PASS'] %>
+  host: localhost
+
+development:
+  <<: *default
+  database: annotate_dev
+
+test:
+  <<: *default
+  database: annotate_test
+
+production:
+  <<: *default
+  database: annotate_production
+  username: annotate
+  password: <%= ENV["ANNOTATE_DATABASE_PASSWORD"] %>

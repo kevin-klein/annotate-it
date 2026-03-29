@@ -1,0 +1,234 @@
+import React, { useRef, useState } from 'react';
+import useSWR from 'swr';
+import { fetcher } from '../services/api';
+
+const InfoPanel = ({ selectedProjectId, selectedImage, onUpload, onStartAnnotation }) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Fetch project data
+  const { data: projectData, error: projectError } = useSWR(
+    selectedProjectId ? `/api/projects/${selectedProjectId}` : null,
+    fetcher
+  );
+
+  // Fetch images for the project
+  const { data: imagesData, mutate: mutateImages } = useSWR(
+    selectedProjectId ? `/api/images?projectId=${selectedProjectId}` : null,
+    fetcher,
+    { dedupingInterval: 5000 }
+  );
+
+  // Fetch stats
+  const { data: stats } = useSWR('/api/images/stats', fetcher);
+
+  const images = imagesData?.images || [];
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      onUpload(file);
+      mutateImages();
+      setIsUploading(false);
+    }
+    e.target.value = '';
+  };
+
+  const renderProjectInfo = () => {
+    if (projectError) {
+      return (
+        <div className="empty-state">
+          <div className="empty-state-icon">⚠️</div>
+          <div className="empty-state-title">Error loading project</div>
+        </div>
+      );
+    }
+
+    if (!projectData || !projectData.project) {
+      return (
+        <div className="empty-state">
+          <div className="empty-state-icon">⏳</div>
+          <div className="empty-state-title">Loading project...</div>
+        </div>
+      );
+    }
+
+    const project = projectData.project;
+
+    return (
+      <div>
+        <div className="info-section">
+          <div className="info-section-title">Project Information</div>
+          <div className="info-row">
+            <span className="info-label">Name</span>
+            <span className="info-value">{project.name}</span>
+          </div>
+          <div className="info-row">
+            <span className="info-label">Type</span>
+            <span className="info-value">{project.type}</span>
+          </div>
+          {project.description && (
+            <div className="info-row">
+              <span className="info-label">Description</span>
+              <span className="info-value">{project.description}</span>
+            </div>
+          )}
+          <div className="info-row">
+            <span className="info-label">Created</span>
+            <span className="info-value">{project.created_at.split('T')[0]}</span>
+          </div>
+        </div>
+
+        <div className="info-section">
+          <div className="info-section-title">Project Statistics</div>
+          {stats && (
+            <div className="grid-stats">
+              <div className="stat-card">
+                <div className="stat-card-value">{stats.total_images || 0}</div>
+                <div className="stat-card-label">Images</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-card-value">{stats.object_detection_count || 0}</div>
+                <div className="stat-card-label">Objects</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-card-value">{stats.segmentation_count || 0}</div>
+                <div className="stat-card-label">Segments</div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="info-section">
+          <div className="info-section-title">Quick Actions</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <button
+              className="upload-btn"
+              onClick={() => setIsUploading(true)}
+            >
+              + Add Images to Project
+            </button>
+
+            <button
+              className="nav-btn active"
+              onClick={onStartAnnotation}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                justifyContent: 'center',
+              }}
+            >
+              🎨 Start Annotating →
+            </button>
+          </div>
+        </div>
+
+        {/* Upload Section */}
+        {isUploading && (
+          <div className="info-section">
+            <div className="info-section-title">Upload Image</div>
+            <div style={{
+              padding: '1rem',
+              background: 'var(--bg-tertiary)',
+              borderRadius: '6px',
+              marginBottom: '1rem',
+            }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-secondary)',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'inherit',
+                  borderRadius: '4px',
+                  marginBottom: '0.5rem',
+                }}
+              />
+              <button
+                onClick={() => setIsUploading(false)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  background: 'var(--bg-hover)',
+                  border: '1px solid var(--border-secondary)',
+                  color: 'var(--text-secondary)',
+                  fontFamily: 'inherit',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Images */}
+        {images && images.length > 0 && (
+          <div className="info-section">
+            <div className="info-section-title">Recent Images</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {images.slice(0, 5).map(image => (
+                <div key={image.id} style={{
+                  padding: '0.75rem',
+                  background: 'var(--bg-tertiary)',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  border: '1px solid var(--border-secondary)',
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={() => onStartAnnotation()}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
+                      {image.original_name}
+                    </span>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--text-muted)',
+                    }}>
+                      {image.width}x{image.height}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {images.length > 5 && (
+                <div style={{
+                  textAlign: 'center',
+                  fontSize: '0.8rem',
+                  color: 'var(--text-muted)',
+                  marginTop: '0.5rem',
+                }}>
+                  + {images.length - 5} more images
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <aside className="info-panel">
+      <div className="info-panel-header">
+        <h3>Project Overview</h3>
+      </div>
+      <div className="info-panel-content">
+        {renderProjectInfo()}
+      </div>
+    </aside>
+  );
+};
+
+export default InfoPanel;

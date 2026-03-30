@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { useLocation } from 'wouter';
 import { api } from '../services/api';
+import ProjectSettings from './ProjectSettings';
 
 const PROJECT_TYPES = [
   {
@@ -30,6 +31,8 @@ export default function ProjectSelection() {
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectDesc, setNewProjectDesc] = useState('');
   const [showCreate, setShowCreate] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   const { data: projectsData, error, mutate } = useSWR('/api/projects', api.fetcher);
   const projects = projectsData?.projects || [];
@@ -59,6 +62,11 @@ export default function ProjectSelection() {
 
   const handleProjectClick = (project) => {
     navigate(`/project/${project.id}/images`);
+  };
+
+  const handleProjectSettings = (project) => {
+    setSelectedProject(project);
+    setShowSettings(true);
   };
 
   if (error) {
@@ -102,19 +110,15 @@ export default function ProjectSelection() {
                 <h4>{project.name}</h4>
                 <p className="project-type">{getProjectTypeLabel(project.type)}</p>
                 {project.description && <p className="project-desc">{project.description}</p>}
-                <div className="project-stats">
-                  {project.progress_percentage > 0 && (
-                    <>
-                      <span className="progress-label">Progress: {project.progress_percentage.toFixed(1)}%</span>
-                      <div className="progress-bar">
-                        <div
-                          className="progress-fill"
-                          style={{ width: `${Math.min(project.progress_percentage, 100)}%` }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
+                <button
+                  className="btn-settings"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleProjectSettings(project);
+                  }}
+                >
+                  ⚙️ Settings
+                </button>
               </div>
             </button>
           ))}
@@ -182,6 +186,18 @@ export default function ProjectSelection() {
           </div>
         )}
       </div>
+
+      {/* Project Settings Modal */}
+      {showSettings && selectedProject && (
+        <ProjectSettings
+          projectId={selectedProject.id}
+          project={selectedProject}
+          onClose={() => setShowSettings(false)}
+          onSave={() => {
+            mutate();
+          }}
+        />
+      )}
     </div>
   );
 }

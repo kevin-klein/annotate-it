@@ -97,6 +97,7 @@ const ProjectImages = ({ onBackToProjects }) => {
             selectedProjectId={projectId}
             activeAnnotationType={activeAnnotationType}
             onTypeChange={setActiveAnnotationType}
+            projectLabels={[]}
           />
         ) : (
           <div className="main-content-empty">

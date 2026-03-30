@@ -9,6 +9,19 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
   const [_, navigate] = useLocation();
   const { id: projectId } = useParams();
   const [selectedImageId, setSelectedImageId] = useState(null);
+  const [projectData, setProjectData] = useState(null);
+
+  // Fetch project data
+  const { data: projectResponse } = useSWR(
+    projectId ? `/api/projects/${projectId}` : null,
+    fetcher
+  );
+
+  useEffect(() => {
+    if (projectResponse?.project) {
+      setProjectData(projectResponse.project);
+    }
+  }, [projectResponse]);
 
   // Fetch images for the project
   const { data: imagesData, mutate: mutateImages } = useSWR(
@@ -108,6 +121,7 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
               selectedProjectId={projectId}
               activeAnnotationType={projectType}
               onTypeChange={() => {}}
+              projectLabels={projectData?.labels || []}
               annotations={annotations}
               onAnnotationsSaved={handleAnnotationSave}
             />

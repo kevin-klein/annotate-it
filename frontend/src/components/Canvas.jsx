@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 import { fetcher } from '../services/api';
 
-const Canvas = ({ selectedImage, selectedProjectId, activeAnnotationType, onTypeChange, onAnnotationsSaved }) => {
+const Canvas = ({ selectedImage, selectedProjectId, activeAnnotationType, onTypeChange, onAnnotationsSaved, projectLabels = [] }) => {
   const [projectData, setProjectData] = useState(null);
   const [projectType, setProjectType] = useState(null);
 
@@ -31,6 +31,13 @@ const Canvas = ({ selectedImage, selectedProjectId, activeAnnotationType, onType
   const [label, setLabel] = useState('');
   const [confidence, setConfidence] = useState(1);
   const [annotations, setAnnotations] = useState([]);
+
+  // Initialize label with first project label if available
+  useEffect(() => {
+    if (projectLabels.length > 0) {
+      setLabel(projectLabels[0]);
+    }
+  }, [projectLabels]);
 
   const stageRef = useRef(null);
   const containerRef = useRef(null);
@@ -91,17 +98,6 @@ const Canvas = ({ selectedImage, selectedProjectId, activeAnnotationType, onType
 
     // For object detection, use 2-point drawing
     if (projectType === 'object_detection') {
-      // const newAnnotation = {
-      //   id: uuidv4(),
-      //   image_id: selectedImage.id,
-      //   project_id: projectData?.id,
-      //   type: projectType,
-      //   label: label,
-      //   confidence: confidence,
-      //   data: null,
-      //   metadata: null,
-      // };
-      // setAnnotations(prev => [...prev, newAnnotation]);
       setLabel('');
       setConfidence(1);
 

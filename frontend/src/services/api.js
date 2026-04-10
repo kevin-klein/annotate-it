@@ -3,7 +3,7 @@ export const fetcher = async (url) => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
-  return response.json();
+  return await response.json();
 };
 
 export const api = {
@@ -33,6 +33,8 @@ export const api = {
   deleteProject: (id) => fetch(`/api/projects/${id}`, { method: 'DELETE' }).then(res => res.json()),
   getProjectStats: (id) => fetch(`/api/projects/${id}/stats`).then(res => res.json()),
   getProjectAnnotations: (id) => fetch(`/api/projects/${id}/annotations`).then(res => res.json()),
+
+  deleteLabel: (id) => fetch(`/api/labels/${id}`, { method: 'DELETE' }).then(res => res.json()),
 
   // Datasets
   getDatasets: () => fetch('/api/datasets').then(res => res.json()),

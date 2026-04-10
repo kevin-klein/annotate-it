@@ -9,27 +9,28 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
 
   // Fetch images for the selected project
   const { data: imagesData, mutate: mutateImages } = useSWR(
-    selectedProjectId ? `/api/images?projectId=${selectedProjectId}` : null,
+    selectedProjectId ? `/api/images?project_id=${selectedProjectId}` : null,
     fetcher,
     { dedupingInterval: 5000 }
   );
 
   // Fetch stats
-  const { data: stats } = useSWR(
-    selectedProjectId ? `/api/images/stats?projectId=${selectedProjectId}` : null,
-    fetcher
-  );
+  // const { data: stats } = useSWR(
+  //   selectedProjectId ? `/api/images/stats?projectId=${selectedProjectId}` : null,
+  //   fetcher
+  // );
+  const stats = null
 
   const images = imagesData || [];
 
   const handleUpload = async (file) => {
     setUploading(true);
     const formData = new FormData();
-    formData.append('image', file);
-    formData.append('projectId', selectedProjectId);
+    formData.append('image[image]', file);
+    formData.append('image[project_id]', selectedProjectId);
 
     try {
-      const res = await fetch('/api/upload', {
+      const res = await fetch('/api/images', {
         method: 'POST',
         body: formData,
       });

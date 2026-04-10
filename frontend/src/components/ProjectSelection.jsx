@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import { useLocation } from 'wouter';
 import { api } from '../services/api';
 import ProjectSettings from './ProjectSettings';
+import { isFunction } from 'swr/_internal';
 
 const PROJECT_TYPES = [
   {
@@ -34,8 +35,7 @@ export default function ProjectSelection() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
 
-  const { data: projectsData, error, mutate } = useSWR('/api/projects', api.fetcher);
-  const projects = projectsData?.projects || [];
+  const { data: projects, error, mutate, isLoading } = useSWR('/api/projects', api.fetcher);
 
   const handleCreateProject = async () => {
     if (!newProjectName || !selectedType) return;
@@ -44,7 +44,7 @@ export default function ProjectSelection() {
       const response = await api.post('/api/projects', {
         name: newProjectName,
         description: newProjectDesc,
-        project_type: selectedType
+        annotation_type: selectedType
       });
 
       if (response.success) {
@@ -69,6 +69,10 @@ export default function ProjectSelection() {
     setShowSettings(true);
   };
 
+  if(isLoading) {
+    return <div>Loading ...</div>
+  }
+
   if (error) {
     return (
       <div className="selection-container">
@@ -85,15 +89,8 @@ export default function ProjectSelection() {
 
   return (
     <div className="selection-container">
-      <h2 className="title">AI Annotation Studio</h2>
+      <h2 className="title">Annotate-IT</h2>
       <p className="subtitle">Select or create a project to begin</p>
-      <button
-        className="btn-create"
-        onClick={() => setShowCreate(true)}
-        style={{ marginBottom: '1rem' }}
-      >
-        + New Project
-      </button>
 
       {/* Existing Projects */}
       {projects.length > 0 && (
@@ -110,7 +107,7 @@ export default function ProjectSelection() {
                 <h4>{project.name}</h4>
                 <p className="project-type">{getProjectTypeLabel(project.type)}</p>
                 {project.description && <p className="project-desc">{project.description}</p>}
-                <button
+                <span
                   className="btn-settings"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -118,7 +115,7 @@ export default function ProjectSelection() {
                   }}
                 >
                   ⚙️ Settings
-                </button>
+                </span>
               </div>
             </button>
           ))}

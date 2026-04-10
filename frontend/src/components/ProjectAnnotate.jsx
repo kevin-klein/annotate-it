@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
 import useSWR from 'swr';
 import { fetcher } from '../services/api';
@@ -25,7 +25,7 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
 
   // Fetch images for the project
   const { data: imagesData, mutate: mutateImages } = useSWR(
-    projectId ? `/api/images?projectId=${projectId}` : null,
+    projectId ? `/api/images?project_id=${projectId}` : null,
     fetcher,
     { dedupingInterval: 5000 }
   );
@@ -71,7 +71,7 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
       />
       <div className="main-content">
         {/* Image list sidebar */}
-        <aside className="annotation-list-sidebar">
+        <aside className="sidebar">
           <div className="sidebar-header">
             <button className="btn-back" onClick={handleBackToImages}>
               ←
@@ -119,7 +119,7 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
             <Canvas
               selectedImage={selectedImage}
               selectedProjectId={projectId}
-              activeAnnotationType={projectType}
+              activeAnnotationType={projectData?.type}
               onTypeChange={() => {}}
               projectLabels={projectData?.labels || []}
               annotations={annotations}

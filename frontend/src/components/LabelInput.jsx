@@ -3,13 +3,13 @@ import React from 'react';
 const LabelInput = ({ label, labels, onLabelChange}) => {
 
   React.useEffect(() => {
-    if(label === '') {
-      onLabelChange(labels[0].name)
+    if(label.id === undefined) {
+      onLabelChange(labels[0])
     }
   }, [labels])
 
   const handleLabelChange = (e) => {
-    onLabelChange(e.target.value);
+    onLabelChange(labels.find(label => label.name === e.target.value));
   };
 
   return (
@@ -17,7 +17,7 @@ const LabelInput = ({ label, labels, onLabelChange}) => {
       <label htmlFor="label-select">Label:</label>
       <select
         id="label-select"
-        value={label}
+        value={label.name}
         onChange={handleLabelChange}
       >
         {labels.map(label => <option value={label.name} key={label.id}>{label.name}</option>)}

@@ -1,25 +1,71 @@
-import React from 'react';
-import { Stage, Layer, Rect, Line, Text as KonvaText, Image as KonvaImage, Group } from 'react-konva';
+import React, { useRef } from 'react';
+import { Stage, Layer, Rect, Line, Text as KonvaText, Image as KonvaImage, Group, Transformer } from 'react-konva';
 
 const DrawingCanvas = ({
   imageObj,
   selectedImage,
   scale,
   offset,
+  labels,
   annotations,
   drawingPoints,
   projectType,
+  selectedAnnotationId,
+  onSelectAnnotation,
+  onUpdateAnnotation,
   onStageMouseDown,
   onStageMouseMove,
   onStageMouseUp,
   stageRef,
+  project,
   containerRef,
 }) => {
+  const transformerRef = useRef(null);
+  const annotationRefs = useRef({});
   const contrastiveCount = annotations.filter(a => a.type === 'contrastive_learning').length;
-  const renderAnnotation = (annotation) => {
-    const color = '#7c3aed';
+  const isSelected = (annotation) => {
+    return selectedAnnotationId === annotation.id;
+  };
 
-    if (annotation.annotation_type === 'object_detection') {
+  const handleAnnotationClick = (e, annotation) => {
+    e.cancelBubble = true;
+    onSelectAnnotation(annotation.id);
+  };
+
+  const updateTransformer = (annotationId) => {
+    if (transformerRef.current && annotationRefs.current[annotationId]) {
+      transformerRef.current.nodes([annotationRefs.current[annotationId]]);
+    }
+  };
+
+  React.useEffect(() => {
+    updateTransformer(selectedAnnotationId);
+  }, [selectedAnnotationId]);
+
+  const handleTransformEnd = (e) => {
+    const node = e.target;
+    const annotationId = node.id();
+    if (!annotationId || !transformerRef.current || !onUpdateAnnotation) return;
+
+    const { x, y, width, height } = node.attrs;
+
+    // Find the annotation and update its data
+    onUpdateAnnotation({
+      id: annotationId,
+      data: [
+        [x, y],
+        [x + width, y],
+        [x + width, y + height],
+        [x, y + height],
+      ],
+    });
+  };
+
+  const renderAnnotation = (annotation) => {
+    const color = isSelected(annotation) ? '#00d4ff' : '#7c3aed';
+    const isSelectedAnnotation = isSelected(annotation);
+
+    if (project.annotation_type === 'object_detection') {
       const points = annotation.data;
       if (!points || points.length !== 4) return null;
 
@@ -30,27 +76,41 @@ const DrawingCanvas = ({
 
       return (
         <React.Fragment key={annotation.id}>
-          <Rect
-            x={x}
-            y={y}
-            width={width}
-            height={height}
-            stroke={color}
-            strokeWidth={2}
-          />
-          <KonvaText
-            text={annotation.label || 'object'}
-            x={x}
-            y={y - 20}
-            fontSize={14}
-            fill={color}
-            fontStyle="bold"
-          />
+          <Group
+            ref={(node) => {
+              if (node) {
+                annotationRefs.current[annotation.id] = node;
+              } else {
+                delete annotationRefs.current[annotation.id];
+              }
+            }}
+            onClick={(e) => handleAnnotationClick(e, annotation)}
+            onDblClick={(e) => handleAnnotationClick(e, annotation)}
+          >
+            <Rect
+              x={x}
+              y={y}
+              width={width}
+              height={height}
+              stroke={color}
+              strokeWidth={2}
+              name="annotation"
+            />
+            <KonvaText
+              text={labels.find(label => label.id === annotation.label_id)?.name || 'object'}
+              x={x}
+              y={y - 20}
+              fontSize={14}
+              fill={color}
+              fontStyle="bold"
+              name="annotation"
+            />
+          </Group>
         </React.Fragment>
       );
     }
 
-    if (annotation.type === 'instance_segmentation') {
+    if (project.type === 'instance_segmentation') {
       const points = annotation.data;
       if (!points || points.length < 3) return null;
 
@@ -77,7 +137,7 @@ const DrawingCanvas = ({
       );
     }
 
-    if (annotation.type === 'contrastive_learning') {
+    if (project.type === 'contrastive_learning') {
       const points = annotation.metadata?.contrastivePoints || [];
       return (
         <React.Fragment key={annotation.id}>
@@ -201,6 +261,30 @@ const DrawingCanvas = ({
         )}
         {annotations.map(renderAnnotation)}
         {renderDrawingPreview()}
+      </Layer>
+      <Layer>
+        {selectedAnnotationId && (
+          <Transformer
+            ref={transformerRef}
+            anchorSize={8}
+            keepRatio={false}
+            anchorCornerRadius={4}
+            anchorStroke="#00d4ff"
+            anchorFill="#ffffff"
+            stroke="#00d4ff"
+            strokeWidth={2}
+            rotateEnabled={false}
+            padding={0}
+            boundBoxFunc={(oldBox, newBox) => {
+              // Limit resize to not go negative
+              if (newBox.width < 5 || newBox.height < 5) {
+                return oldBox;
+              }
+              return newBox;
+            }}
+            onTransformEnd={handleTransformEnd}
+          />
+        )}
       </Layer>
     </Stage>
   );

@@ -2,7 +2,9 @@ import React from 'react';
 import AnnotationItem from './AnnotationItem';
 import LabelInput from './LabelInput';
 
-const AnnotationPanel = ({ annotations, onSave, onDelete, label, onLabelChange, labels }) => {
+const AnnotationPanel = ({ project,
+  annotations, onSave, onDelete, label, onLabelChange,
+  labels, onSelectAnnotation, selectedAnnotationId }) => {
   return (
     <div className="annotations-panel">
       <div className="panel-header">
@@ -28,8 +30,12 @@ const AnnotationPanel = ({ annotations, onSave, onDelete, label, onLabelChange, 
           {annotations.map(annotation => (
             <AnnotationItem
               key={annotation.id}
+              project={project}
+              labels={labels}
               annotation={annotation}
               onDelete={onDelete}
+              onSelect={onSelectAnnotation}
+              isSelected={selectedAnnotationId === annotation.id}
             />
           ))}
         </div>

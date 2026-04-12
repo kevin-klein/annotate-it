@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AnnotationItem = ({ annotation, onDelete }) => {
+const AnnotationItem = ({ project, labels, annotation, onDelete, onSelect, isSelected }) => {
   const getIconForType = (type) => {
     switch (type) {
       case 'object_detection': return '🔲';
@@ -13,7 +13,7 @@ const AnnotationItem = ({ annotation, onDelete }) => {
   const renderCoords = () => {
     if (!annotation.data) return null;
 
-    if (annotation.type === 'object_detection') {
+    if (project.annotation_type === 'object_detection') {
       return (
         <div className="annotation-coords">
           x: {Math.round(annotation.data[0][0])}, y: {Math.round(annotation.data[0][1])}
@@ -21,7 +21,7 @@ const AnnotationItem = ({ annotation, onDelete }) => {
       );
     }
 
-    if (annotation.type === 'instance_segmentation') {
+    if (project.annotation_type === 'instance_segmentation') {
       return (
         <div className="annotation-coords">
           {annotation.data.length} points
@@ -33,13 +33,19 @@ const AnnotationItem = ({ annotation, onDelete }) => {
   };
 
   return (
-    <div className="annotation-item">
+    <div
+      className={`annotation-item ${isSelected ? 'selected' : ''}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.(annotation.id);
+      }}
+    >
       <div className="annotation-info">
         <span className="annotation-type">
           {getIconForType(annotation.type)}
         </span>
         <span className="annotation-label">
-          {annotation.label || 'Untitled'}
+          {labels.find(label => label.id === annotation.label_id)?.name || 'Untitled'}
         </span>
       </div>
       {renderCoords()}

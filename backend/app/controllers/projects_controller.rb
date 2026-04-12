@@ -1,5 +1,5 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: %i[ show update destroy export ]
+  before_action :set_project, only: %i[show update destroy export]
 
   # GET /projects
   def index
@@ -45,22 +45,24 @@ class ProjectsController < ApplicationController
     export_service = ExportProjectToZip.new(@project)
     result = export_service.run
 
-    send_file(
-      result[:zip_path],
-      filename: result[:file_name],
-      type: 'application/zip',
-      disposition: 'attachment',
-      status: :ok)
+    send_data(
+      result.read,
+      filename: "export.zip",
+      type: "application/zip",
+      disposition: "attachment",
+      status: :ok
+    )
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_project
-      @project = Project.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def project_params
-      params.expect(project: [ :name, :description, :annotation_type ])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_project
+    @project = Project.find(params.expect(:id))
+  end
+
+  # Only allow a list of trusted parameters through.
+  def project_params
+    params.expect(project: [:name, :description, :annotation_type])
+  end
 end

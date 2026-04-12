@@ -28,6 +28,11 @@ const Canvas = ({
     fetcher
   );
 
+  const { data: existingAnnotations, isLoading: isAnnotationsLoading, error: annotationsError } = useSWR(
+    selectedProjectId ? `/api/annotations?image_id=${selectedImage.id}` : null,
+    fetcher
+  );
+
   useEffect(() => {
     if (project) {
       setProjectData(project);
@@ -38,14 +43,20 @@ const Canvas = ({
     }
   }, [project, activeAnnotationType, onTypeChange]);
 
+  React.useEffect(() => {
+    if(existingAnnotations) {
+      setAnnotations(existingAnnotations)
+    }
+  }, [existingAnnotations])
+
   // Tools: Hand for paning, Add for adding annotations
 
-  const [label, setLabel] = useState('');
+  const [label, setLabel] = useState({});
   const [tool, setTool] = useState('hand');
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [selectedAnnotationId, setSelectedAnnotationId] = useState(null);
 
-  const [confidence, setConfidence] = useState(1);
   const [annotations, setAnnotations] = useState([]);
 
   const [scale, setScale] = useState(1);
@@ -115,8 +126,6 @@ const Canvas = ({
 
     // For object detection, use 2-point drawing
     if (projectType === 'object_detection') {
-      setConfidence(1);
-
       // Add first point (top-left corner)
       setDrawingPoints([scaledPos]);
       setIsDrawing(true);
@@ -130,13 +139,10 @@ const Canvas = ({
         image_id: selectedImage.id,
         project_id: projectData?.id,
         type: projectType,
-        label: label,
-        confidence: confidence,
+        label_id: label.id,
         data: null,
-        metadata: null,
       };
       setAnnotations(prev => [...prev, newAnnotation]);
-      setConfidence(1);
     }
   };
 
@@ -190,9 +196,8 @@ const Canvas = ({
       setAnnotations(prev => [...prev, {
         id: uuidv4(),
         data: points,
-        annotation_type: 'object_detection',
-        label: label,
-        confidence: confidence,
+        label_id: label.id,
+        image_id: selectedImage.id,
       }]);
     } else if (projectType === 'instance_segmentation' && drawingPoints.length >= 3) {
       setAnnotations(prev => {
@@ -211,7 +216,6 @@ const Canvas = ({
         image_id: selectedImage.id,
         type: projectType,
         label: 'contrastive_point',
-        confidence: 1,
         data: null,
         metadata: { contrastivePoints: [drawingPoints[drawingPoints.length - 1]] },
       }]);
@@ -224,13 +228,15 @@ const Canvas = ({
 
     try {
       await Promise.all(
-        annotations.map(annotation =>
-          fetch('/api/annotations', {
+        annotations.map(annotation => {
+          const {id, data, label_id, image_id} = annotation;
+
+          return fetch('/api/annotations', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(annotation),
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ annotation: {id, label_id, data, image_id} }),
           })
-        )
+        })
       );
 
       if (onAnnotationsSaved) {
@@ -241,8 +247,26 @@ const Canvas = ({
     }
   };
 
+  const handleUpdateAnnotation = (updatedAnnotation) => {
+    setAnnotations(prev =>
+      prev.map(a => (a.id === updatedAnnotation.id ? updatedAnnotation : a))
+    );
+  };
+
   const handleDeleteAnnotation = (id) => {
     setAnnotations(prev => prev.filter(a => a.id !== id));
+    if(typeof id === 'number') {
+      fetch(`/api/annotations/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+      })
+    }
+
+    setSelectedAnnotationId(null);
+  };
+
+  const handleAnnotationSelect = (id) => {
+    setSelectedAnnotationId(id);
   };
 
   const handleZoomIn = () => setScale(s => Math.min(s * 1.2, 3));
@@ -293,7 +317,7 @@ const Canvas = ({
     }
   };
 
-  if (isProjectLoading || isLabelsLoading) {
+  if (isProjectLoading || isLabelsLoading || isAnnotationsLoading) {
     return (
       <div className="canvas-container" ref={containerRef}>
         <div className="canvas-loading-overlay">
@@ -312,13 +336,18 @@ const Canvas = ({
   return (
     <div className="canvas-container" ref={containerRef} onWheel={handleWheel}>
       <DrawingCanvas
+        project={project}
         imageObj={imageObj}
         selectedImage={selectedImage}
         scale={scale}
         offset={offset}
+        labels={labels}
         annotations={annotations}
         drawingPoints={drawingPoints}
         projectType={projectType}
+        selectedAnnotationId={selectedAnnotationId}
+        onSelectAnnotation={handleAnnotationSelect}
+        onUpdateAnnotation={handleUpdateAnnotation}
         onStageMouseDown={handleStageMouseDown}
         onStageMouseMove={handleStageMouseMove}
         onStageMouseUp={handleStageMouseUp}
@@ -337,12 +366,15 @@ const Canvas = ({
       />
 
       <AnnotationPanel
+        project={project}
         label={label}
         labels={labels}
         onLabelChange={setLabel}
         annotations={annotations}
         onSave={handleSaveAllAnnotations}
         onDelete={handleDeleteAnnotation}
+        onSelectAnnotation={handleAnnotationSelect}
+        selectedAnnotationId={selectedAnnotationId}
       />
     </div>
   );

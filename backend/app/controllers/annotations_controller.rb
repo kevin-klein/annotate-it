@@ -1,9 +1,9 @@
 class AnnotationsController < ApplicationController
-  before_action :set_annotation, only: %i[ show update destroy ]
+  before_action :set_annotation, only: %i[show update destroy]
 
   # GET /annotations
   def index
-    @annotations = Annotation.all
+    @annotations = Annotation.where(image_id: params[:image_id])
 
     render json: @annotations
   end
@@ -15,7 +15,13 @@ class AnnotationsController < ApplicationController
 
   # POST /annotations
   def create
-    @annotation = Annotation.new(annotation_params)
+    ap annotation_params
+    if annotation_params[:id].is_a?(Integer)
+      @annotation = Annotation.find(annotation_params[:id])
+      @annotation.update(annotation_params)
+    else
+      @annotation = Annotation.new(annotation_params)
+    end
 
     if @annotation.save
       render json: @annotation, status: :created, location: @annotation
@@ -39,13 +45,15 @@ class AnnotationsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_annotation
-      @annotation = Annotation.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def annotation_params
-      params.expect(annotation: [ :image_id, :data, :label_id ])
+  # Use callbacks to share common setup or constraints between actions.
+  def set_annotation
+    @annotation = Annotation.find(params.expect(:id))
+  end
+
+  def annotation_params
+    params.require(:annotation).permit(:id, :image_id, :label_id, data: [[]]).tap do |whitelisted|
+      whitelisted[:data] = params[:annotation][:data] if params[:annotation][:data]
     end
+  end
 end

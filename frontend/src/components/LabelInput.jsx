@@ -13,30 +13,10 @@ const LabelInput = ({ label, labels, onLabelChange}) => {
   };
 
   return (
-    <div style={{
-        position: 'absolute',
-        bottom: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-primary)',
-        borderRadius: '8px',
-        padding: '1rem',
-        display: 'flex',
-        gap: '1rem',
-        alignItems: 'center',
-        boxShadow: 'var(--shadow-lg)',
-      }}>
+    <div className="label-input">
+      <label htmlFor="label-select">Label:</label>
       <select
-        placeholder="Label..."
-        style={{
-            padding: '0.5rem',
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border-secondary)',
-            color: 'var(--text-primary)',
-            fontFamily: 'inherit',
-            borderRadius: '4px',
-          }}
+        id="label-select"
         value={label}
         onChange={handleLabelChange}
       >

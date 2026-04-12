@@ -26,12 +26,21 @@ class ImagesController < ApplicationController
 
   # POST /images
   def create
-    @image = Image.new(image_params)
+    if image_is_zip?
+      project = Project.find(params[:image][:project_id])
+      ImportZipFile.new.run(project, params[:image][:image])
 
-    if @image.save
-      render json: @image, status: :created, location: @image
+      render json: {
+        success: true
+      }
     else
-      render json: @image.errors, status: :unprocessable_content
+      @image = Image.new(image_params)
+
+      if @image.save
+        render json: @image, status: :created, location: @image
+      else
+        render json: @image.errors, status: :unprocessable_content
+      end
     end
   end
 
@@ -60,5 +69,9 @@ class ImagesController < ApplicationController
     # Only allow a list of trusted parameters through.
     def image_params
       params.expect(image: [ :project_id, :image ])
+    end
+
+    def image_is_zip?
+      params[:image][:image].content_type == 'application/x-zip-compressed'
     end
 end

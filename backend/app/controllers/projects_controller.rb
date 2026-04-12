@@ -1,5 +1,5 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: %i[ show update destroy ]
+  before_action :set_project, only: %i[ show update destroy export ]
 
   # GET /projects
   def index
@@ -38,6 +38,19 @@ class ProjectsController < ApplicationController
     @project.destroy!
 
     render json: {}
+  end
+
+  # GET /projects/:id/export
+  def export
+    export_service = ExportProjectToZip.new(@project)
+    result = export_service.run
+
+    send_file(
+      result[:zip_path],
+      filename: result[:file_name],
+      type: 'application/zip',
+      disposition: 'attachment',
+      status: :ok)
   end
 
   private

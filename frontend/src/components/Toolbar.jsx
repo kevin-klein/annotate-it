@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Toolbar = ({ scale, onZoomIn, onZoomOut, projectType }) => {
+const Toolbar = ({ scale, onZoomIn, onZoomOut, projectType, tool, onToolChange, onExport }) => {
   const getToolLabel = (type) => {
     switch (type) {
       case 'object_detection': return 'Object Detection';
@@ -21,11 +21,30 @@ const Toolbar = ({ scale, onZoomIn, onZoomOut, projectType }) => {
           )}
         </div>
         <div className="tool-group">
+          <button
+            className={`tool-btn ${tool === 'hand' ? 'active' : ''}`}
+            onClick={() => onToolChange('hand')}
+          >
+            Hand
+          </button>
+          <button
+            className={`tool-btn ${tool === 'add' ? 'active' : ''}`}
+            onClick={() => onToolChange('add')}
+          >
+            Draw
+          </button>
+        </div>
+        <div className="tool-group">
           <button className="tool-btn" onClick={onZoomIn}>
             + Zoom
           </button>
           <button className="tool-btn" onClick={onZoomOut}>
             - Zoom
+          </button>
+        </div>
+        <div className="tool-group">
+          <button className="tool-btn" onClick={onExport}>
+            📥 Export
           </button>
         </div>
       </div>

@@ -1,23 +1,8 @@
 import React from 'react';
 import AnnotationItem from './AnnotationItem';
+import LabelInput from './LabelInput';
 
-const AnnotationPanel = ({ annotations, onSave, onDelete }) => {
-  if (annotations.length === 0) {
-    return (
-      <div className="annotations-panel">
-        <div className="panel-content">
-          <div className="empty-state">
-            <div className="empty-state-icon">✏️</div>
-            <div className="empty-state-title">No annotations yet</div>
-            <div className="empty-state-desc">
-              Click on the image to create annotations
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+const AnnotationPanel = ({ annotations, onSave, onDelete, label, onLabelChange, labels }) => {
   return (
     <div className="annotations-panel">
       <div className="panel-header">
@@ -31,6 +16,14 @@ const AnnotationPanel = ({ annotations, onSave, onDelete }) => {
         </button>
       </div>
       <div className="panel-content">
+        <div className="annotation-controls">
+          <LabelInput
+            label={label}
+            labels={labels}
+            onLabelChange={onLabelChange}
+          />
+        </div>
+
         <div className="annotation-list">
           {annotations.map(annotation => (
             <AnnotationItem

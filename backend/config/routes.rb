@@ -3,7 +3,9 @@ Rails.application.routes.draw do
     resources :annotations
     resources :labels
     resources :images
-    resources :projects
+    resources :projects do
+      get :export, on: :member
+    end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

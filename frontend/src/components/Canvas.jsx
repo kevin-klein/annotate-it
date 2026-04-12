@@ -14,6 +14,7 @@ const Canvas = ({
   onTypeChange,
   onAnnotationsSaved,
 }) => {
+  const [exporting, setExporting] = useState(false);
   const [projectData, setProjectData] = useState(null);
   const [projectType, setProjectType] = useState(null);
 
@@ -40,7 +41,9 @@ const Canvas = ({
   // Tools: Hand for paning, Add for adding annotations
 
   const [label, setLabel] = useState('');
-  const [tool, setTools] = useState('hand')
+  const [tool, setTool] = useState('hand');
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
 
   const [confidence, setConfidence] = useState(1);
   const [annotations, setAnnotations] = useState([]);
@@ -92,9 +95,16 @@ const Canvas = ({
       });
     }
   }, [selectedImage, containerRef.current]);
-
   const handleStageMouseDown = (e) => {
     if (e.evt.button !== 0) return;
+
+    if (tool === 'hand') {
+      setIsPanning(true);
+      setPanStart({ x: e.evt.clientX, y: e.evt.clientY });
+      return;
+    }
+
+    if (tool !== 'add' || !selectedImage) return;
 
     const stage = e.target.getStage();
     const pos = stage.getPointerPosition();
@@ -131,7 +141,17 @@ const Canvas = ({
   };
 
   const handleStageMouseMove = (e) => {
-     if (!isDrawing || !selectedImage) return;
+    if (!selectedImage) return;
+
+    if (isPanning) {
+      const dx = e.evt.clientX - panStart.x;
+      const dy = e.evt.clientY - panStart.y;
+      setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+      setPanStart({ x: e.evt.clientX, y: e.evt.clientY });
+      return;
+    }
+
+    if (!isDrawing || tool !== 'add') return;
 
     const stage = e.target.getStage();
     const pos = stage.getPointerPosition();
@@ -141,13 +161,17 @@ const Canvas = ({
     };
 
     // For object detection, update the second point (bottom-right corner) for live preview
-    // if (projectType === 'object_detection') {
-      setDrawingPoints([drawingPoints[0], scaledPos]);
-    // }
+    setDrawingPoints([drawingPoints[0], scaledPos]);
   };
 
   const handleStageMouseUp = () => {
+    setIsPanning(false);
     setIsDrawing(false);
+
+    if (tool !== 'add') {
+      setDrawingPoints([]);
+      return;
+    }
 
     if (projectType === 'object_detection' && drawingPoints.length === 2) {
       const [p1, p2] = drawingPoints;
@@ -195,7 +219,6 @@ const Canvas = ({
 
     setDrawingPoints([]);
   };
-
   const handleSaveAllAnnotations = async () => {
     if (annotations.length === 0) return;
 
@@ -225,6 +248,51 @@ const Canvas = ({
   const handleZoomIn = () => setScale(s => Math.min(s * 1.2, 3));
   const handleZoomOut = () => setScale(s => Math.max(s / 1.2, 0.1));
 
+  const handleWheel = (e) => {
+    e.preventDefault();
+
+    // Determine zoom direction based on scroll delta
+    const delta = e.deltaY > 0 ? -1 : 1;
+    const zoomFactor = 1.1;
+
+    if (delta > 0) {
+      // Zoom in
+      setScale(s => Math.min(s * zoomFactor, 3));
+    } else {
+      // Zoom out
+      setScale(s => Math.max(s / zoomFactor, 0.1));
+    }
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const response = await fetch(`/api/projects/${selectedProjectId}/export`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
+
+      // Download the file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `project_export_${Date.now()}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export project. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (isProjectLoading || isLabelsLoading) {
     return (
       <div className="canvas-container" ref={containerRef}>
@@ -242,7 +310,7 @@ const Canvas = ({
   }
 
   return (
-    <div className="canvas-container" ref={containerRef}>
+    <div className="canvas-container" ref={containerRef} onWheel={handleWheel}>
       <DrawingCanvas
         imageObj={imageObj}
         selectedImage={selectedImage}
@@ -263,15 +331,15 @@ const Canvas = ({
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         projectType={projectType}
-      />
-
-      <LabelInput
-        label={label}
-        labels={labels}
-        onLabelChange={setLabel}
+        tool={tool}
+        onToolChange={setTool}
+        onExport={handleExport}
       />
 
       <AnnotationPanel
+        label={label}
+        labels={labels}
+        onLabelChange={setLabel}
         annotations={annotations}
         onSave={handleSaveAllAnnotations}
         onDelete={handleDeleteAnnotation}

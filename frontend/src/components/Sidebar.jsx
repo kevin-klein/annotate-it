@@ -6,6 +6,8 @@ import { fetcher } from '../services/api';
 const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }) => {
   const [uploading, setUploading] = React.useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState(null);
 
   // Fetch images for the selected project
   const { data: imagesData, mutate: mutateImages } = useSWR(
@@ -23,26 +25,66 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
 
   const images = imagesData || [];
 
-  const handleUpload = async (file) => {
+  const handleUpload = (file, onProgress, onError) => {
     setUploading(true);
+    setUploadError(null);
+
     const formData = new FormData();
     formData.append('image[image]', file);
     formData.append('image[project_id]', selectedProjectId);
 
-    try {
-      const res = await fetch('/api/images', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        mutateImages();
+    // Use XMLHttpRequest for progress tracking
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable && onProgress) {
+        const percentComplete = Math.round((e.loaded / e.total) * 100);
+        onProgress(percentComplete);
+        setUploadProgress(percentComplete);
       }
-    } catch (error) {
-      console.error('Upload error:', error);
-    } finally {
+    });
+
+    xhr.addEventListener('load', async () => {
+      if (xhr.status === 200 || xhr.status === 201) {
+        try {
+          const data = await xhr.response ? JSON.parse(xhr.response) : {};
+          if (data.success || data.image) {
+            mutateImages();
+            if (onProgress) onProgress(100);
+          }
+        } catch (error) {
+          const errorMessage = 'Upload completed but response was invalid';
+          if (onError) onError(errorMessage);
+          setUploadError(errorMessage);
+        }
+      } else {
+        try {
+          const errorData = await xhr.response ? JSON.parse(xhr.response) : {};
+          const errorMessage = errorData.error || errorData.message || 'Upload failed';
+          if (onError) onError(errorMessage);
+          setUploadError(errorMessage);
+        } catch {
+          const errorMessage = 'Upload failed. Please try again.';
+          if (onError) onError(errorMessage);
+          setUploadError(errorMessage);
+        }
+      }
       setUploading(false);
-    }
+    });
+
+    xhr.addEventListener('error', () => {
+      const errorMessage = 'Network error occurred during upload';
+      if (onError) onError(errorMessage);
+      setUploadError(errorMessage);
+      setUploading(false);
+    });
+
+    xhr.addEventListener('abort', () => {
+      setUploading(false);
+    });
+
+    xhr.open('POST', '/api/images');
+    xhr.send(formData);
   };
 
   return (
@@ -189,9 +231,16 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
 
       <UploadModal
         isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
+        onClose={() => {
+          setShowUploadModal(false);
+          setUploadError(null);
+          setUploadProgress(0);
+        }}
         onUpload={handleUpload}
         uploading={uploading}
+        setUploadProgress={setUploadProgress}
+        uploadProgress={uploadProgress}
+        uploadError={uploadError}
       />
     </aside>
   );

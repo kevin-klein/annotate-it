@@ -1,8 +1,11 @@
 import React, { useRef, useState } from 'react';
 
-const UploadModal = ({ isOpen, onClose, onUpload, uploading = false }) => {
+const UploadModal = ({ isOpen, setUploadProgress, onClose, onUpload, uploading = false, uploadProgress = 0, uploadError: propError }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [internalError, setInternalError] = useState(null);
   const fileInputRef = useRef(null);
+
+  const uploadError = propError || internalError;
 
   if (!isOpen) return null;
 
@@ -18,11 +21,11 @@ const UploadModal = ({ isOpen, onClose, onUpload, uploading = false }) => {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
+    setInternalError(null);
 
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      onUpload(file);
-      onClose();
+    if (file) {
+      handleUpload(file);
     }
   };
 
@@ -33,10 +36,14 @@ const UploadModal = ({ isOpen, onClose, onUpload, uploading = false }) => {
   const handleChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      onUpload(file);
-      onClose();
+      handleUpload(file);
     }
     e.target.value = '';
+  };
+
+  const handleUpload = (file) => {
+    setInternalError(null);
+    onUpload(file, setUploadProgress, setInternalError);
   };
 
   return (
@@ -59,7 +66,7 @@ const UploadModal = ({ isOpen, onClose, onUpload, uploading = false }) => {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,.zip"
             onChange={handleChange}
             style={{ display: 'none' }}
           />
@@ -67,12 +74,46 @@ const UploadModal = ({ isOpen, onClose, onUpload, uploading = false }) => {
           <div className="upload-icon">📁</div>
           <div className="upload-text">
             <div className="upload-title">Click to upload or drag and drop</div>
-            <div className="upload-subtitle">PNG, JPG, GIF up to 10MB</div>
+            <div className="upload-subtitle">PNG, JPG, GIF, ZIP up to 10MB</div>
           </div>
         </div>
 
+        <div className="upload-progress-container">
+          {uploading && (
+            <>
+              <div className="upload-progress-bar">
+                <div
+                  className="upload-progress-fill"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <div className="upload-progress-text">
+                {uploadProgress < 100 ? `${uploadProgress}%` : 'Complete!'}
+              </div>
+            </>
+          )}
+          {uploadError && (
+            <div className="upload-error">
+              <span className="error-icon">⚠️</span>
+              <span>{uploadError}</span>
+              <button
+                className="error-retry-btn"
+                onClick={() => {
+                  setInternalError(null);
+                  // Reset the file input so the same file can be selected again
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                  }
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="upload-footer">
-          <button className="modal-cancel" onClick={onClose}>
+          <button className="modal-cancel" onClick={onClose} disabled={uploading}>
             {uploading ? 'Uploading...' : 'Cancel'}
           </button>
         </div>

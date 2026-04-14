@@ -6,7 +6,7 @@ class User < ApplicationRecord
   validates :password_digest, presence: true
 
   def generate_jwt
-    JWT.encode({user_id: id, exp: 1.day.from_now.to_i}, Rails.application.secrets.secret_key_base, "HS256")
+    JWT.encode({user_id: id, exp: 1.day.from_now.to_i}, Rails.application.credentials.secret_key_base, "HS256")
   end
 
   def generate_login_code

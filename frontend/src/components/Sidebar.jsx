@@ -141,6 +141,7 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
                       <div className="sidebar-item-title">{image.original_name}</div>
                     </div>
                     <div className="sidebar-item-meta">
+                      <span>{image.id}</span>
                       <span>{image.width}x{image.height}</span>
                       <span>{image.created_at.split('T')[0]}</span>
                     </div>

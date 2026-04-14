@@ -1,5 +1,3 @@
-import { api } from './api';
-
 // Store authentication token in localStorage
 const TOKEN_KEY = 'auth_token';
 

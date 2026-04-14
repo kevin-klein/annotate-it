@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { useLocation } from 'wouter';
-import { authenticatedApi as api } from '../services/api';
+import { authenticatedApi as api } from '../services/auth';
 import ProjectSettings from './ProjectSettings';
 import { isFunction } from 'swr/_internal';
 

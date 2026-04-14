@@ -239,11 +239,10 @@ const Canvas = ({
         })
       );
 
-      if (onAnnotationsSaved) {
-        onAnnotationsSaved();
-      }
+      alert('All annotations saved!')
     } catch (error) {
       console.error('Error saving annotations:', error);
+      alert('Error saving annotations!')
     }
   };
 

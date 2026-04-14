@@ -9,7 +9,7 @@ import Canvas from './components/Canvas';
 import ProjectSelection from './components/ProjectSelection';
 import ProjectAnnotate from './components/ProjectAnnotate';
 import LoginForm from './components/LoginForm';
-import { fetcher } from './services/api';
+import { authenticatedApi as api } from './services/auth';
 
 const App = () => {
   const handleBackToProjects = useCallback(() => {
@@ -17,7 +17,7 @@ const App = () => {
   }, []);
 
   return (
-    <SWRConfig value={{ fetcher }}>
+    <SWRConfig value={{ fetcher: api.fetcher }}>
       <div className="app">
         <Navbar />
         <Switch>
@@ -76,9 +76,15 @@ const ProjectImages = ({ onBackToProjects }) => {
     formData.append('projectId', projectId);
 
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...authService.getAuthHeader()
+      };
+
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
+        headers
       });
       const data = await res.json();
       if (data.success) {

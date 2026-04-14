@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import UploadModal from './UploadModal';
-import { fetcher } from '../services/api';
+import { authenticatedApi as api } from '../services/auth';
 
 const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }) => {
   const [uploading, setUploading] = React.useState(false);
@@ -12,7 +12,7 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
   // Fetch images for the selected project
   const { data: imagesData, mutate: mutateImages } = useSWR(
     selectedProjectId ? `/api/images?project_id=${selectedProjectId}` : null,
-    fetcher,
+    api.fetcher,
     { dedupingInterval: 5000 }
   );
 

@@ -11,12 +11,12 @@ export const authService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
-    
+
     if (!response.ok) {
       const data = await response.json();
       throw new Error(data.error || 'Failed to send login code');
     }
-    
+
     return await response.json();
   },
 
@@ -27,12 +27,12 @@ export const authService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, code }),
     });
-    
+
     if (!response.ok) {
       const data = await response.json();
       throw new Error(data.error || 'Invalid or expired code');
     }
-    
+
     const data = await response.json();
     localStorage.setItem(TOKEN_KEY, data.token);
     return data;
@@ -45,11 +45,11 @@ export const authService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    
+
     if (!response.ok) {
       throw new Error('Invalid credentials');
     }
-    
+
     const data = await response.json();
     localStorage.setItem(TOKEN_KEY, data.token);
     return data;
@@ -62,12 +62,12 @@ export const authService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, password_confirmation: passwordConfirmation }),
     });
-    
+
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.errors?.join(', ') || 'Registration failed');
     }
-    
+
     const data = await response.json();
     localStorage.setItem(TOKEN_KEY, data.token);
     return data;
@@ -96,9 +96,9 @@ export const authService = {
 export const authenticatedApi = {
   // Generic POST with auth
   post: (path, data) => {
-    const headers = { 
-      'Content-Type': 'application/json', 
-      ...authService.getAuthHeader() 
+    const headers = {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
     };
     return fetch(path, {
       method: 'POST',
@@ -107,12 +107,25 @@ export const authenticatedApi = {
     }).then(res => res.json());
   },
 
+  fetcher: async (url) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
+    };
+
+    const response = await fetch(url, { headers });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  },
+
   // Projects
   getProjects: () => fetch('/api/projects', { headers: authService.getAuthHeader() }).then(res => res.json()),
   createProject: (data) => {
-    const headers = { 
-      'Content-Type': 'application/json', 
-      ...authService.getAuthHeader() 
+    const headers = {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
     };
     return fetch('/api/projects', {
       method: 'POST',
@@ -122,9 +135,9 @@ export const authenticatedApi = {
   },
   getProject: (id) => fetch(`/api/projects/${id}`, { headers: authService.getAuthHeader() }).then(res => res.json()),
   updateProject: (id, data) => {
-    const headers = { 
-      'Content-Type': 'application/json', 
-      ...authService.getAuthHeader() 
+    const headers = {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
     };
     return fetch(`/api/projects/${id}`, {
       method: 'PUT',
@@ -132,26 +145,26 @@ export const authenticatedApi = {
       body: JSON.stringify(data),
     }).then(res => res.json());
   },
-  deleteProject: (id) => fetch(`/api/projects/${id}`, { 
-    method: 'DELETE', 
-    headers: authService.getAuthHeader() 
+  deleteProject: (id) => fetch(`/api/projects/${id}`, {
+    method: 'DELETE',
+    headers: authService.getAuthHeader()
   }).then(res => res.json()),
   getProjectStats: (id) => fetch(`/api/projects/${id}/stats`, { headers: authService.getAuthHeader() }).then(res => res.json()),
   getProjectAnnotations: (id) => fetch(`/api/projects/${id}/annotations`, { headers: authService.getAuthHeader() }).then(res => res.json()),
 
   // Labels
-  deleteLabel: (id) => fetch(`/api/labels/${id}`, { 
-    method: 'DELETE', 
-    headers: authService.getAuthHeader() 
+  deleteLabel: (id) => fetch(`/api/labels/${id}`, {
+    method: 'DELETE',
+    headers: authService.getAuthHeader()
   }).then(res => res.json()),
 
   // Datasets
   getDatasets: () => fetch('/api/datasets', { headers: authService.getAuthHeader() }).then(res => res.json()),
   getDataset: (id) => fetch(`/api/datasets/${id}`, { headers: authService.getAuthHeader() }).then(res => res.json()),
   createDataset: (data) => {
-    const headers = { 
-      'Content-Type': 'application/json', 
-      ...authService.getAuthHeader() 
+    const headers = {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
     };
     return fetch('/api/datasets', {
       method: 'POST',
@@ -160,9 +173,9 @@ export const authenticatedApi = {
     }).then(res => res.json());
   },
   updateDataset: (id, data) => {
-    const headers = { 
-      'Content-Type': 'application/json', 
-      ...authService.getAuthHeader() 
+    const headers = {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
     };
     return fetch(`/api/datasets/${id}`, {
       method: 'PUT',
@@ -170,9 +183,9 @@ export const authenticatedApi = {
       body: JSON.stringify(data),
     }).then(res => res.json());
   },
-  deleteDataset: (id) => fetch(`/api/datasets/${id}`, { 
-    method: 'DELETE', 
-    headers: authService.getAuthHeader() 
+  deleteDataset: (id) => fetch(`/api/datasets/${id}`, {
+    method: 'DELETE',
+    headers: authService.getAuthHeader()
   }).then(res => res.json()),
 
   // Images
@@ -185,9 +198,9 @@ export const authenticatedApi = {
     const query = new URLSearchParams(params).toString();
     return fetch(`/api/annotations?imageId=${id}${query ? `&${query}` : ''}`, { headers: authService.getAuthHeader() }).then(res => res.json());
   },
-  deleteImage: (id) => fetch(`/api/images/${id}`, { 
-    method: 'DELETE', 
-    headers: authService.getAuthHeader() 
+  deleteImage: (id) => fetch(`/api/images/${id}`, {
+    method: 'DELETE',
+    headers: authService.getAuthHeader()
   }).then(res => res.json()),
 
   // Annotations
@@ -197,9 +210,9 @@ export const authenticatedApi = {
   },
   getAnnotation: (id) => fetch(`/api/annotations/${id}`, { headers: authService.getAuthHeader() }).then(res => res.json()),
   createAnnotation: (data) => {
-    const headers = { 
-      'Content-Type': 'application/json', 
-      ...authService.getAuthHeader() 
+    const headers = {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
     };
     return fetch('/api/annotations', {
       method: 'POST',
@@ -208,9 +221,9 @@ export const authenticatedApi = {
     }).then(res => res.json());
   },
   updateAnnotation: (id, data) => {
-    const headers = { 
-      'Content-Type': 'application/json', 
-      ...authService.getAuthHeader() 
+    const headers = {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
     };
     return fetch(`/api/annotations/${id}`, {
       method: 'PUT',
@@ -218,9 +231,9 @@ export const authenticatedApi = {
       body: JSON.stringify(data),
     }).then(res => res.json());
   },
-  deleteAnnotation: (id) => fetch(`/api/annotations/${id}`, { 
-    method: 'DELETE', 
-    headers: authService.getAuthHeader() 
+  deleteAnnotation: (id) => fetch(`/api/annotations/${id}`, {
+    method: 'DELETE',
+    headers: authService.getAuthHeader()
   }).then(res => res.json()),
 
   // Upload

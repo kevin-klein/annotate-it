@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import useSWR from 'swr';
-import { api } from '../services/api';
+import { authenticatedApi as api } from '../services/auth';
 
 const ProjectSettings = ({ projectId, onClose, onSave }) => {
   const [_, navigate] = useLocation();

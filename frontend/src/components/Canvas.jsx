@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
-import { fetcher } from '../services/api';
+import { authenticatedApi as api } from '../services/auth';
 import DrawingCanvas from './DrawingCanvas';
 import Toolbar from './Toolbar';
 import AnnotationPanel from './AnnotationPanel';
@@ -20,17 +20,17 @@ const Canvas = ({
 
   const { data: project, isLoading: isProjectLoading } = useSWR(
     selectedProjectId ? `/api/projects/${selectedProjectId}` : null,
-    fetcher
+    api.fetcher
   );
 
   const { data: labels, isLoading: isLabelsLoading, error: labelsError, mutate: mutateLabels } = useSWR(
     selectedProjectId ? `/api/labels?projectId=${selectedProjectId}` : null,
-    fetcher
+    api.fetcher
   );
 
   const { data: existingAnnotations, isLoading: isAnnotationsLoading, error: annotationsError } = useSWR(
     selectedProjectId ? `/api/annotations?image_id=${selectedImage.id}` : null,
-    fetcher
+    api.fetcher
   );
 
   useEffect(() => {

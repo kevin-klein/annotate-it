@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
 import useSWR from 'swr';
-import { fetcher } from '../services/api';
+import { authenticatedApi as api } from '../services/auth';
 import Header from './Header';
 import Canvas from './Canvas';
 
@@ -14,7 +14,7 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
   // Fetch project data
   const { data: projectResponse } = useSWR(
     projectId ? `/api/projects/${projectId}` : null,
-    fetcher
+    api.fetcher
   );
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
   // Fetch images for the project
   const { data: imagesData, mutate: mutateImages } = useSWR(
     projectId ? `/api/images?project_id=${projectId}` : null,
-    fetcher,
+    api.fetcher,
     { dedupingInterval: 5000 }
   );
 
@@ -34,7 +34,7 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
   const selectedImage = imagesData?.images?.find(img => img.id === selectedImageId);
   const { data: annotationsData, mutate: mutateAnnotations } = useSWR(
     selectedImageId ? `/api/annotations?imageId=${selectedImageId}&type=object_detection` : null,
-    fetcher
+    api.fetcher
   );
 
   const images = imagesData?.images || [];

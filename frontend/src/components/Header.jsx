@@ -1,13 +1,13 @@
 import React from 'react';
 import useSWR from 'swr';
-import { fetcher } from '../services/api';
+import { authenticatedApi as api } from '../services/auth';
 import { useLocation } from 'wouter';
 
 const Header = ({ activeView, selectedProjectId, onBackToProjects }) => {
   const [_, navigate] = useLocation();
   const { data: projectData, error } = useSWR(
     selectedProjectId ? `/api/projects/${selectedProjectId}` : null,
-    fetcher
+    api.fetcher
   );
 
   const handleGoHome = () => {
@@ -38,7 +38,7 @@ const Header = ({ activeView, selectedProjectId, onBackToProjects }) => {
       {projectData && projectData.project && (
         <div className="project-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button 
+            <button
               onClick={handleGoHome}
               className="btn-back"
               title="Back to projects"

@@ -52,6 +52,7 @@ const ProjectAnnotate = ({ onBackToProjects }) => {
 
   const handleAnnotationSave = useCallback(() => {
     mutateAnnotations();
+    alert('Successfully saved!')
   }, [mutateAnnotations]);
 
   const handleAnnotationUpdate = useCallback(() => {

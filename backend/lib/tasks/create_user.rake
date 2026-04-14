@@ -2,8 +2,6 @@ namespace :users do
   desc "Create a new user"
   task create_user: :environment do
     email = ask("Email: ").strip
-    password = ask("Password: ") { |q| q.echo = false }
-    password_confirmation = ask("Password confirmation: ") { |q| q.echo = false }
 
     user = User.new(email: email, password: password, password_confirmation: password_confirmation)
 

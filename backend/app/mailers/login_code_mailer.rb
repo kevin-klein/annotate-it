@@ -1,6 +1,4 @@
 class LoginCodeMailer < ApplicationMailer
-  default from: "noreply@annotate.local"
-
   def login_code_email(user, code)
     @user = user
     @code = code

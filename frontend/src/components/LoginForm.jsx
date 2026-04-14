@@ -114,7 +114,6 @@ const VerifyLoginCode = ({ email, onVerifySuccess, onCancel }) => {
           className="login-form-input"
           placeholder="123456"
           required
-          maxLength="6"
         />
       </div>
       {error && <div className="login-form-error">{error}</div>}

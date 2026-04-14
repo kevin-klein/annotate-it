@@ -26,7 +26,7 @@ class ZipFileExtractor
         next if entry.ftype == :directory
         next if entry.name.include?('__MACOSX')
 
-        if %w[png jpg xml].include?(entry.extension)
+        if %w[png jpg xml].include?(entry.name.split('.')[-1])
           entries << Entry.new(entry.name, entry.get_input_stream.read)
         else
           warnings << "File #{entry.name} ignored"

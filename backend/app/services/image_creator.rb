@@ -1,6 +1,8 @@
 class ImageCreator
-  def create(image_data)
+  def create(project, image_data)
     io = StringIO.new(image_data)
-    Image.create!(image: io)
+    image = Image.create!(project: project)
+    image.image.attach(io: io, filename: "#{image.id}.jpg")
+    image
   end
 end

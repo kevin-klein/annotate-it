@@ -248,8 +248,9 @@ const Canvas = ({
   };
 
   const handleUpdateAnnotation = (updatedAnnotation) => {
+    console.log(updatedAnnotation)
     setAnnotations(prev =>
-      prev.map(a => (a.id === updatedAnnotation.id ? updatedAnnotation : a))
+      prev.map(a => (a.id === updatedAnnotation.id ? {...a, ...updatedAnnotation} : a))
     );
   };
 

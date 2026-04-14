@@ -3,7 +3,6 @@ import useSWR from 'swr';
 import { useLocation } from 'wouter';
 import { authenticatedApi as api } from '../services/auth';
 import ProjectSettings from './ProjectSettings';
-import { isFunction } from 'swr/_internal';
 
 const PROJECT_TYPES = [
   {

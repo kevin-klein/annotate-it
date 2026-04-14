@@ -130,7 +130,7 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
 
             {/* Image List */}
             {images && images.length > 0 && (
-              <div className="annotation-list">
+              <div className="annotation-list" style={{maxHeight: 800}}>
                 {images.map(image => (
                   <div
                     key={image.id}

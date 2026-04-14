@@ -1,9 +1,5 @@
 class User < ApplicationRecord
-  has_secure_password
-  has_many :projects
-
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
-  validates :password_digest, presence: true
 
   def generate_jwt
     JWT.encode({user_id: id, exp: 1.day.from_now.to_i}, Rails.application.credentials.secret_key_base, "HS256")

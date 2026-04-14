@@ -29,16 +29,12 @@ class ImportZipFile
   def import_entries(project, entries, warnings)
     Image.transaction do
       entries.select(&:image?).each do |image_entry|
-        import_image_with_annotations(project, image_entry, warnings)
+        annotation_entry = zip_extractor.annotation_for_image(entries, image_entry)
+    
+        image = image_creator.create(project, image_entry.data)
+        save_annotations(project, image, annotation_entry)
       end
     end
-  end
-
-  def import_image_with_annotations(project, image_entry, warnings)
-    annotation_entry = zip_extractor.annotation_for_image(image_entry)
-    
-    image = image_creator.create(image_entry.data)
-    save_annotations(project, image, annotation_entry)
   end
 
   def save_annotations(project, image, annotation_entry)

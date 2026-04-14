@@ -1,9 +1,9 @@
 namespace :users do
   desc "Create a new user"
-  task create_user: :environment do
+  task create: :environment do
     email = ask("Email: ").strip
 
-    user = User.new(email: email, password: password, password_confirmation: password_confirmation)
+    user = User.new(email: email)
 
     if user.save
       puts "User created successfully: #{email}"

@@ -1,5 +1,5 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: %i[ show update destroy ]
+  before_action :set_image, only: %i[show update destroy]
 
   # GET /images
   def index
@@ -61,17 +61,18 @@ class ImagesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_image
-      @image = Image.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def image_params
-      params.expect(image: [ :project_id, :image ])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_image
+    @image = Image.find(params.expect(:id))
+  end
 
-    def image_is_zip?
-      params[:image][:image].content_type == 'application/x-zip-compressed'
-    end
+  # Only allow a list of trusted parameters through.
+  def image_params
+    params.expect(image: [:project_id, :image])
+  end
+
+  def image_is_zip?
+    params[:image][:image].content_type == "application/x-zip-compressed"
+  end
 end

@@ -31,3 +31,7 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Ansible
+inventory.ini
+group_vars/all.yml
+*.retry

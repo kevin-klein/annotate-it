@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      body { font-family: sans-serif; line-height: 1.6; color: #333; }
+      .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+      .code { font-size: 32px; font-weight: bold; letter-spacing: 4px; text-align: center; margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 8px; }
+      .expires { color: #666; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Welcome to Annotate</h2>
+      <p>Your login code is:</p>
+      <div class="code"><%= @code %></div>
+      <p class="expires">This code expires in <%= @expires_in %>.</p>
+      <p>If you didn't request this code, you can safely ignore this email.</p>
+    </div>
+  </body>
+</html>

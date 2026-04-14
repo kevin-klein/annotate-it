@@ -1,5 +1,5 @@
 class LabelsController < ApplicationController
-  before_action :set_label, only: %i[ show update destroy ]
+  before_action :set_label, only: %i[show update destroy]
 
   # GET /labels
   def index
@@ -41,13 +41,14 @@ class LabelsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_label
-      @label = Label.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def label_params
-      params.expect(label: [ :project_id, :name, :color ])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_label
+    @label = Label.find(params.expect(:id))
+  end
+
+  # Only allow a list of trusted parameters through.
+  def label_params
+    params.expect(label: [:project_id, :name, :color])
+  end
 end

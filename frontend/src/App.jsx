@@ -1,27 +1,41 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { SWRConfig } from 'swr';
 import { Route, Switch, Redirect, useParams } from 'wouter';
+import { authService } from './services/auth';
+import Navbar from './components/Navbar';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Canvas from './components/Canvas';
 import ProjectSelection from './components/ProjectSelection';
 import ProjectAnnotate from './components/ProjectAnnotate';
+import LoginForm from './components/LoginForm';
 import { fetcher } from './services/api';
 
 const App = () => {
   const handleBackToProjects = useCallback(() => {
-    window.location.href = '/';
+    window.location.href = '/projects';
   }, []);
 
   return (
     <SWRConfig value={{ fetcher }}>
       <div className="app">
+        <Navbar />
         <Switch>
-          {/* Home route - Project Selection */}
+          {/* Home route - Redirect to projects if authenticated */}
           <Route path="/">
+            <Redirect to={authService.isAuthenticated() ? '/projects' : '/login'} />
+          </Route>
+
+          {/* Projects route */}
+          <Route path="/projects">
             <div className="full-screen">
               <ProjectSelection />
             </div>
+          </Route>
+
+          {/* Login route */}
+          <Route path="/login">
+            <LoginForm onLoginSuccess={() => window.location.href = '/projects'} />
           </Route>
 
           {/* Project Images route */}

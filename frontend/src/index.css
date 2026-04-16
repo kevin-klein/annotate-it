@@ -27,6 +27,11 @@
   box-sizing: border-box;
 }
 
+html, body, #root, .app {
+    margin: 0;
+    height: 100%;
+}
+
 body {
   font-family: 'Consolas', 'Courier New', monospace;
   background: var(--bg-primary);

@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import useSWR from 'swr';
 import { authenticatedApi as api } from '../services/auth';
+import { useToast } from '../context/ToastContext';
 
 const ProjectSettings = ({ projectId, onClose, onSave }) => {
+  const { showToast } = useToast();
   const [_, navigate] = useLocation();
   const [newLabel, setNewLabel] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -50,7 +52,7 @@ const ProjectSettings = ({ projectId, onClose, onSave }) => {
       mutateLabels();
     } catch (error) {
       console.error('Error adding label:', error);
-      alert(`Failed to add label: ${error.message}`);
+      showToast(`Failed to add label: ${error.message}`, 'error');
     }
   };
 
@@ -60,7 +62,7 @@ const ProjectSettings = ({ projectId, onClose, onSave }) => {
       mutateLabels();
     } catch (error) {
       console.error('Error removing label:', error);
-      alert(`Failed to remove label: ${error.message}`);
+      showToast(`Failed to remove label: ${error.message}`, 'error');
     }
   };
 

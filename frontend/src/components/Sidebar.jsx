@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import UploadModal from './UploadModal';
 import { authenticatedApi as api } from '../services/auth';
 
-const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }) => {
+const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, saveStatus, isSaving }) => {
   const [uploading, setUploading] = React.useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -157,6 +157,14 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
                 <div className="empty-state-desc">Add images to start annotating</div>
               </div>
             )}
+
+            {/* Save progress overlay */}
+            {isSaving && (
+              <div className="sidebar-save-overlay">
+                <div className="saving-spinner" style={{ width: 20, height: 20, borderWidth: 3 }} />
+                <span>Saving annotations...</span>
+              </div>
+            )}
           </div>
         </>
       )}
@@ -165,8 +173,16 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
         <>
           <div className="sidebar-header">
             <h3>Images</h3>
+            {saveStatus && (
+              <div className={`save-status ${saveStatus}`}>
+                {saveStatus === 'saving' && <div className="saving-spinner" />}
+                <span className="save-status-text">
+                  {saveStatus === 'saved' ? 'Saved' : saveStatus === 'saving' ? 'Saving...' : 'Unsaved'}
+                </span>
+              </div>
+            )}
           </div>
-          <div className="sidebar-content">
+          <div className="sidebar-content" style={{ pointerEvents: isSaving ? 'none' : 'auto' }}>
             {/* Quick Upload */}
             <button
               className="upload-btn"
@@ -224,6 +240,14 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage }
                 <div className="empty-state-icon">📷</div>
                 <div className="empty-state-title">No images yet</div>
                 <div className="empty-state-desc">Add images to start annotating</div>
+              </div>
+            )}
+
+            {/* Save progress overlay */}
+            {isSaving && (
+              <div className="sidebar-save-overlay">
+                <div className="saving-spinner" style={{ width: 20, height: 20, borderWidth: 3 }} />
+                <span>Saving annotations...</span>
               </div>
             )}
           </div>

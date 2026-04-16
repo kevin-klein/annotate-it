@@ -13,10 +13,14 @@ const Canvas = ({
   activeAnnotationType,
   onTypeChange,
   onAnnotationsSaved,
+  onSaveStatusChange,
+  saveFnRef,
 }) => {
   const [exporting, setExporting] = useState(false);
   const [projectData, setProjectData] = useState(null);
   const [projectType, setProjectType] = useState(null);
+  const saveTimeoutRef = useRef(null);
+  const [annotationsVersion, setAnnotationsVersion] = useState(0);
 
   const { data: project, isLoading: isProjectLoading } = useSWR(
     selectedProjectId ? `/api/projects/${selectedProjectId}` : null,
@@ -33,24 +37,6 @@ const Canvas = ({
     api.fetcher
   );
 
-  useEffect(() => {
-    if (project) {
-      setProjectData(project);
-      setProjectType(project.annotation_type);
-      if (project.annotation_type && activeAnnotationType !== project.annotation_type) {
-        onTypeChange(project.annotation_type);
-      }
-    }
-  }, [project, activeAnnotationType, onTypeChange]);
-
-  React.useEffect(() => {
-    if(existingAnnotations) {
-      setAnnotations(existingAnnotations)
-    }
-  }, [existingAnnotations])
-
-  // Tools: Hand for paning, Add for adding annotations
-
   const [label, setLabel] = useState({});
   const [tool, setTool] = useState('hand');
   const [isPanning, setIsPanning] = useState(false);
@@ -66,7 +52,53 @@ const Canvas = ({
 
   const stageRef = useRef(null);
   const containerRef = useRef(null);
+  const canvasAreaRef = useRef(null);
   const [imageObj, setImageObj] = useState(null);
+
+  useEffect(() => {
+    if (project) {
+      setProjectData(project);
+      setProjectType(project.annotation_type);
+      if (project.annotation_type && activeAnnotationType !== project.annotation_type) {
+        onTypeChange(project.annotation_type);
+      }
+    }
+  }, [project, activeAnnotationType, onTypeChange]);
+
+  React.useEffect(() => {
+    if(existingAnnotations) {
+      setAnnotations(existingAnnotations)
+    }
+  }, [existingAnnotations]);
+
+  // Expose save function to parent via ref
+  useEffect(() => {
+    if (saveFnRef) {
+      saveFnRef.current = handleSaveAllAnnotations;
+    }
+  }, [saveFnRef]);
+
+  // Debounced auto-save when annotations are modified by user
+  useEffect(() => {
+    if (annotations.length === 0) return;
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Mark as unsaved when annotations change
+    onSaveStatusChange('unsaved');
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      await handleSaveAllAnnotations();
+    }, 1500);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [annotationsVersion]);
 
   useEffect(() => {
     if (selectedImage?.file_path) {
@@ -94,8 +126,8 @@ const Canvas = ({
   }, [selectedImage]);
 
   useEffect(() => {
-    if (containerRef.current && selectedImage) {
-      const { width, height } = containerRef.current.getBoundingClientRect();
+    if (canvasAreaRef.current && selectedImage) {
+      const { width, height } = canvasAreaRef.current.getBoundingClientRect();
       const scaleX = width / selectedImage.width;
       const scaleY = height / selectedImage.height;
       const newScale = Math.min(scaleX, scaleY) * 0.9;
@@ -105,7 +137,7 @@ const Canvas = ({
         y: (height - selectedImage.height * newScale) / 2,
       });
     }
-  }, [selectedImage, containerRef.current]);
+  }, [selectedImage, canvasAreaRef.current]);
   const handleStageMouseDown = (e) => {
     if (e.evt.button !== 0) return;
 
@@ -143,6 +175,7 @@ const Canvas = ({
         data: null,
       };
       setAnnotations(prev => [...prev, newAnnotation]);
+      setAnnotationsVersion(v => v + 1);
     }
   };
 
@@ -199,6 +232,7 @@ const Canvas = ({
         label_id: label.id,
         image_id: selectedImage.id,
       }]);
+      setAnnotationsVersion(v => v + 1);
     } else if (projectType === 'instance_segmentation' && drawingPoints.length >= 3) {
       setAnnotations(prev => {
         const newAnnotations = [...prev];
@@ -210,6 +244,7 @@ const Canvas = ({
         }
         return newAnnotations;
       });
+      setAnnotationsVersion(v => v + 1);
     } else if (projectType === 'contrastive_learning') {
       setAnnotations(prev => [...prev, {
         id: uuidv4(),
@@ -219,12 +254,21 @@ const Canvas = ({
         data: null,
         metadata: { contrastivePoints: [drawingPoints[drawingPoints.length - 1]] },
       }]);
+      setAnnotationsVersion(v => v + 1);
     }
 
     setDrawingPoints([]);
   };
   const handleSaveAllAnnotations = async () => {
-    if (annotations.length === 0) return;
+    if (annotations.length === 0) {
+      if (onSaveStatusChange) onSaveStatusChange('saved');
+      return;
+    }
+
+    // Mark as saving
+    if (onSaveStatusChange) {
+      onSaveStatusChange('saving');
+    }
 
     try {
       await Promise.all(
@@ -239,10 +283,16 @@ const Canvas = ({
         })
       );
 
-      alert('All annotations saved!')
+      // Mark as saved on success
+      if (onSaveStatusChange) {
+        onSaveStatusChange('saved');
+      }
     } catch (error) {
       console.error('Error saving annotations:', error);
-      alert('Error saving annotations!')
+      // Mark as unsaved on error
+      if (onSaveStatusChange) {
+        onSaveStatusChange('unsaved');
+      }
     }
   };
 
@@ -251,6 +301,7 @@ const Canvas = ({
     setAnnotations(prev =>
       prev.map(a => (a.id === updatedAnnotation.id ? {...a, ...updatedAnnotation} : a))
     );
+    setAnnotationsVersion(v => v + 1);
   };
 
   const handleDeleteAnnotation = (id) => {
@@ -262,6 +313,7 @@ const Canvas = ({
       })
     }
 
+    setAnnotationsVersion(v => v + 1);
     setSelectedAnnotationId(null);
   };
 
@@ -319,7 +371,7 @@ const Canvas = ({
 
   if (isProjectLoading || isLabelsLoading || isAnnotationsLoading) {
     return (
-      <div className="canvas-container" ref={containerRef}>
+      <div className="canvas-layout" ref={containerRef}>
         <div className="canvas-loading-overlay">
           <div className="loading-spinner"></div>
           <p className="loading-message">
@@ -334,36 +386,38 @@ const Canvas = ({
   }
 
   return (
-    <div className="canvas-container" ref={containerRef} onWheel={handleWheel}>
-      <DrawingCanvas
-        project={project}
-        imageObj={imageObj}
-        selectedImage={selectedImage}
-        scale={scale}
-        offset={offset}
-        labels={labels}
-        annotations={annotations}
-        drawingPoints={drawingPoints}
-        projectType={projectType}
-        selectedAnnotationId={selectedAnnotationId}
-        onSelectAnnotation={handleAnnotationSelect}
-        onUpdateAnnotation={handleUpdateAnnotation}
-        onStageMouseDown={handleStageMouseDown}
-        onStageMouseMove={handleStageMouseMove}
-        onStageMouseUp={handleStageMouseUp}
-        stageRef={stageRef}
-        containerRef={containerRef}
-      />
+    <div className="canvas-layout" ref={containerRef} onWheel={handleWheel}>
+      <div className="canvas-area" ref={canvasAreaRef}>
+        <DrawingCanvas
+          project={project}
+          imageObj={imageObj}
+          selectedImage={selectedImage}
+          scale={scale}
+          offset={offset}
+          labels={labels}
+          annotations={annotations}
+          drawingPoints={drawingPoints}
+          projectType={projectType}
+          selectedAnnotationId={selectedAnnotationId}
+          onSelectAnnotation={handleAnnotationSelect}
+          onUpdateAnnotation={handleUpdateAnnotation}
+          onStageMouseDown={handleStageMouseDown}
+          onStageMouseMove={handleStageMouseMove}
+          onStageMouseUp={handleStageMouseUp}
+          stageRef={stageRef}
+          containerRef={canvasAreaRef}
+        />
 
-      <Toolbar
-        scale={scale}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        projectType={projectType}
-        tool={tool}
-        onToolChange={setTool}
-        onExport={handleExport}
-      />
+        <Toolbar
+          scale={scale}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          projectType={projectType}
+          tool={tool}
+          onToolChange={setTool}
+          onExport={handleExport}
+        />
+      </div>
 
       <AnnotationPanel
         project={project}
@@ -371,7 +425,6 @@ const Canvas = ({
         labels={labels}
         onLabelChange={setLabel}
         annotations={annotations}
-        onSave={handleSaveAllAnnotations}
         onDelete={handleDeleteAnnotation}
         onSelectAnnotation={handleAnnotationSelect}
         selectedAnnotationId={selectedAnnotationId}

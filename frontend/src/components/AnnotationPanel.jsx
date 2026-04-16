@@ -2,20 +2,13 @@ import React from 'react';
 import AnnotationItem from './AnnotationItem';
 import LabelInput from './LabelInput';
 
-const AnnotationPanel = ({ project,
-  annotations, onSave, onDelete, label, onLabelChange,
-  labels, onSelectAnnotation, selectedAnnotationId }) => {
+export default function AnnotationPanel ({ project,
+  annotations, onDelete, label, onLabelChange,
+  labels, onSelectAnnotation, selectedAnnotationId }) {
   return (
     <div className="annotations-panel">
       <div className="panel-header">
         <h3>Annotations ({annotations.length})</h3>
-        <button
-          className="btn-save"
-          onClick={onSave}
-          disabled={annotations.length === 0}
-        >
-          Save All
-        </button>
       </div>
       <div className="panel-content">
         <div className="annotation-controls">
@@ -43,5 +36,3 @@ const AnnotationPanel = ({ project,
     </div>
   );
 };
-
-export default AnnotationPanel;

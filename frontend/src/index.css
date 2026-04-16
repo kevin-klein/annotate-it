@@ -233,6 +233,62 @@ body {
   letter-spacing: 0.05em;
 }
 
+.save-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.save-status.saved {
+  color: var(--success);
+  background: rgba(80, 250, 123, 0.1);
+}
+
+.save-status.saving {
+  color: var(--warning, #ffb86c);
+  background: rgba(255, 184, 108, 0.1);
+}
+
+.save-status.unsaved {
+  color: var(--danger);
+  background: rgba(255, 85, 85, 0.1);
+}
+
+.save-status-text {
+  white-space: nowrap;
+}
+
+.saving-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.sidebar-save-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 1rem;
+  color: var(--warning, #ffb86c);
+  background: rgba(255, 184, 108, 0.05);
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
@@ -343,6 +399,25 @@ body {
   background: var(--bg-tertiary);
   position: relative;
   overflow: hidden;
+}
+
+.canvas-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow: hidden;
+}
+
+.canvas-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .canvas-wrapper {
@@ -1461,19 +1536,13 @@ body {
 }
 
 .annotations-panel {
-  position: absolute;
-  top: 100px;
-  right: 20px;
   width: 320px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
+  border-left: 1px solid var(--border-primary);
   display: flex;
   flex-direction: column;
-  max-height: calc(100% - 120px);
+  height: 100%;
   overflow: hidden;
-  z-index: 20;
-  box-shadow: var(--shadow-lg);
 }
 
 .panel-header {
@@ -1637,12 +1706,6 @@ body {
   font-size: 0.75rem;
   color: var(--text-secondary);
   margin-bottom: 0;
-}
-
-.canvas-area {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
 }
 
 /* Project Settings Modal */
@@ -2176,4 +2239,62 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1rem;
+}
+
+/* ===================
+   Toast Notification Styles
+   =================== */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 6px;
+  color: white;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-lg);
+  animation: toast-in 0.3s ease;
+}
+
+.toast-success {
+  background: var(--success);
+  color: var(--bg-primary);
+}
+
+.toast-error {
+  background: var(--danger);
+}
+
+.toast button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.toast button:hover {
+  opacity: 1;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }

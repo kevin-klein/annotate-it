@@ -15,12 +15,12 @@ class AnnotationsController < ApplicationController
 
   # POST /annotations
   def create
-    ap annotation_params
     if annotation_params[:id].is_a?(Integer)
       @annotation = Annotation.find(annotation_params[:id])
       @annotation.update(annotation_params)
     else
-      @annotation = Annotation.new(annotation_params)
+      ap annotation_params
+      @annotation = Annotation.new(annotation_params.except(:id))
     end
 
     if @annotation.save

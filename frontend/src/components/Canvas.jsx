@@ -386,7 +386,7 @@ const Canvas = ({
   }
 
   return (
-    <div className="canvas-layout" onWheel={handleWheel}>
+    <div className="canvas-layout">
       
       <div className="canvas-area">
         <Toolbar
@@ -399,7 +399,7 @@ const Canvas = ({
           onExport={handleExport}
         />
 
-        <div class='' ref={canvasAreaRef}>
+        <div class='' ref={canvasAreaRef} onWheel={handleWheel}>
           <DrawingCanvas
             project={project}
             imageObj={imageObj}

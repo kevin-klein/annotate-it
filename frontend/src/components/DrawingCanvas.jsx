@@ -67,7 +67,7 @@ const DrawingCanvas = ({
   };
 
   const renderAnnotation = (annotation) => {
-    const color = isSelected(annotation) ? '#00d4ff' : '#7c3aed';
+    const color = isSelected(annotation) ? '#00d4ff' : '#9e6ef3';
 
     if (project.annotation_type === 'object_detection') {
       const points = annotation.data;

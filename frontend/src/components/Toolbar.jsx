@@ -11,7 +11,7 @@ const Toolbar = ({ scale, onZoomIn, onZoomOut, projectType, tool, onToolChange, 
   };
 
   return (
-    <div className="canvas-overlay">
+    <div className="toolbar">
       <div className="canvas-tools">
         <div className="tool-group">
           {projectType && (

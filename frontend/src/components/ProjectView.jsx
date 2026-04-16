@@ -92,11 +92,6 @@ const ProjectView = ({ onBackToProjects }) => {
 
   return (
     <>
-      <Header
-        activeView="annotate"
-        selectedProjectId={projectId}
-        onBackToProjects={handleBackToImages}
-      />
       <div className="main-content">
         <Sidebar
           activeView="annotation"

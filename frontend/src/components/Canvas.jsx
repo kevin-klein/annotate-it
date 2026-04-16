@@ -51,7 +51,6 @@ const Canvas = ({
   const [drawingPoints, setDrawingPoints] = useState([]);
 
   const stageRef = useRef(null);
-  const containerRef = useRef(null);
   const canvasAreaRef = useRef(null);
   const [imageObj, setImageObj] = useState(null);
 
@@ -130,7 +129,7 @@ const Canvas = ({
       const { width, height } = canvasAreaRef.current.getBoundingClientRect();
       const scaleX = width / selectedImage.width;
       const scaleY = height / selectedImage.height;
-      const newScale = Math.min(scaleX, scaleY) * 0.9;
+      const newScale = Math.min(scaleX, scaleY) * 0.95;
       setScale(newScale);
       setOffset({
         x: (width - selectedImage.width * newScale) / 2,
@@ -138,6 +137,7 @@ const Canvas = ({
       });
     }
   }, [selectedImage, canvasAreaRef.current]);
+
   const handleStageMouseDown = (e) => {
     if (e.evt.button !== 0) return;
 
@@ -371,7 +371,7 @@ const Canvas = ({
 
   if (isProjectLoading || isLabelsLoading || isAnnotationsLoading) {
     return (
-      <div className="canvas-layout" ref={containerRef}>
+      <div className="canvas-layout">
         <div className="canvas-loading-overlay">
           <div className="loading-spinner"></div>
           <p className="loading-message">
@@ -386,28 +386,9 @@ const Canvas = ({
   }
 
   return (
-    <div className="canvas-layout" ref={containerRef} onWheel={handleWheel}>
-      <div className="canvas-area" ref={canvasAreaRef}>
-        <DrawingCanvas
-          project={project}
-          imageObj={imageObj}
-          selectedImage={selectedImage}
-          scale={scale}
-          offset={offset}
-          labels={labels}
-          annotations={annotations}
-          drawingPoints={drawingPoints}
-          projectType={projectType}
-          selectedAnnotationId={selectedAnnotationId}
-          onSelectAnnotation={handleAnnotationSelect}
-          onUpdateAnnotation={handleUpdateAnnotation}
-          onStageMouseDown={handleStageMouseDown}
-          onStageMouseMove={handleStageMouseMove}
-          onStageMouseUp={handleStageMouseUp}
-          stageRef={stageRef}
-          containerRef={canvasAreaRef}
-        />
-
+    <div className="canvas-layout" onWheel={handleWheel}>
+      
+      <div className="canvas-area">
         <Toolbar
           scale={scale}
           onZoomIn={handleZoomIn}
@@ -417,6 +398,28 @@ const Canvas = ({
           onToolChange={setTool}
           onExport={handleExport}
         />
+
+        <div class='' ref={canvasAreaRef}>
+          <DrawingCanvas
+            project={project}
+            imageObj={imageObj}
+            selectedImage={selectedImage}
+            scale={scale}
+            offset={offset}
+            labels={labels}
+            annotations={annotations}
+            drawingPoints={drawingPoints}
+            projectType={projectType}
+            selectedAnnotationId={selectedAnnotationId}
+            onSelectAnnotation={handleAnnotationSelect}
+            onUpdateAnnotation={handleUpdateAnnotation}
+            onStageMouseDown={handleStageMouseDown}
+            onStageMouseMove={handleStageMouseMove}
+            onStageMouseUp={handleStageMouseUp}
+            stageRef={stageRef}
+            containerRef={canvasAreaRef}
+          />
+        </div>
       </div>
 
       <AnnotationPanel

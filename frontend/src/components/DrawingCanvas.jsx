@@ -44,7 +44,6 @@ const DrawingCanvas = ({
 
   const handleTransformEnd = (e) => {
     const node = annotationRefs.current[selectedAnnotationId]
-    // if (!selectedAnnotationId || !transformerRef.current || !onUpdateAnnotation) return;
 
     const scaleX = node.scaleX()
     const scaleY = node.scaleY()
@@ -67,7 +66,7 @@ const DrawingCanvas = ({
   };
 
   const renderAnnotation = (annotation) => {
-    const color = isSelected(annotation) ? '#00d4ff' : '#9e6ef3';
+    const color = isSelected(annotation) ? '#00d4ff' : '#9d2a00';
 
     if (project.annotation_type === 'object_detection') {
       const points = annotation.data;
@@ -97,7 +96,7 @@ const DrawingCanvas = ({
               width={width}
               height={height}
               stroke={color}
-              strokeWidth={2}
+              strokeWidth={3}
               onTransformEnd={handleTransformEnd}
               name="annotation"
             />
@@ -129,7 +128,7 @@ const DrawingCanvas = ({
               text={labels.find(label => label.id === annotation.label_id)?.name || 'object'}
               x={x}
               y={y - 20}
-              fontSize={14}
+              fontSize={20}
               fill={color}
               fontStyle="bold"
               name="annotation"

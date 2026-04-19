@@ -1,6 +1,14 @@
 // Store authentication token in localStorage
 const TOKEN_KEY = 'auth_token';
 
+// Redirect helper (extracted for testability)
+export const redirect = (url) => {
+  window.location.href = url;
+};
+
+// Test injection: allow tests to override the redirect function
+let _redirect = redirect;
+
 export const authService = {
   // Request login code
   requestLoginCode: async (email) => {
@@ -79,8 +87,11 @@ export const authService = {
     } catch (e) {
       // Ignore errors during logout — token may already be expired
     }
-    window.location.href = '/login';
+    _redirect('/login');
   },
+
+  // Get the authentication token
+  getToken: () => localStorage.getItem(TOKEN_KEY),
 
   // Check if user is authenticated
   isAuthenticated: () => !!localStorage.getItem(TOKEN_KEY),
@@ -94,7 +105,7 @@ export const authService = {
 
 export const handleUnauthorized = () => {
   localStorage.removeItem('auth_token');
-  window.location.href = '/login';
+  _redirect('/login');
 };
 
 export const safeFetch = async (url, options = {}) => {
@@ -215,3 +226,7 @@ export const authenticatedApi = {
   // Stats
   getStats: () => safeFetch('/api/images/stats', { headers: authService.getAuthHeader() }),
 };
+
+// Test injection exports
+export const setRedirectMock = (fn) => { _redirect = fn; };
+export const resetRedirectMock = () => { _redirect = redirect; };

@@ -386,7 +386,7 @@ const Canvas = ({
           onExport={handleExport}
         />
 
-        <div ref={canvasAreaRef} onWheel={handleWheel}>
+        <div ref={canvasAreaRef} onWheel={handleWheel} style={{ flex: 1, width: '100%', display: 'flex' }}>
           {<DrawingCanvas
             project={project}
             imageObj={imageObj}

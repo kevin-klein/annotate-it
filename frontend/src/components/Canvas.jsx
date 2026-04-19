@@ -53,6 +53,7 @@ const Canvas = ({
   const stageRef = useRef(null);
   const canvasAreaRef = useRef(null);
   const [imageObj, setImageObj] = useState(null);
+  const [displayImageObj, setDisplayImageObj] = useState(null);
 
   useEffect(() => {
     if (project) {
@@ -103,7 +104,10 @@ const Canvas = ({
     if (selectedImage?.file_path) {
       const img = new window.Image();
       img.src = selectedImage.file_path;
-      img.onload = () => setImageObj(img);
+      img.onload = () => {
+        setImageObj(img);
+        setDisplayImageObj(img);
+      };
       img.onerror = () => {
         console.error('Failed to load image:', selectedImage.file_path);
       };
@@ -114,7 +118,10 @@ const Canvas = ({
           if (data.image?.url) {
             const img = new window.Image();
             img.src = data.image.url;
-            img.onload = () => setImageObj(img);
+            img.onload = () => {
+              setImageObj(img);
+              setDisplayImageObj(img);
+            };
             img.onerror = () => {
               console.error('Failed to load image:', data.image.url);
             };
@@ -401,7 +408,7 @@ const Canvas = ({
         <div ref={canvasAreaRef} onWheel={handleWheel}>
           <DrawingCanvas
             project={project}
-            imageObj={imageObj}
+            imageObj={displayImageObj}
             selectedImage={selectedImage}
             scale={scale}
             offset={offset}

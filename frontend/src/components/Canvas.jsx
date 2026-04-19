@@ -53,8 +53,6 @@ const Canvas = ({
   const stageRef = useRef(null);
   const canvasAreaRef = useRef(null);
   const [imageObj, setImageObj] = useState(null);
-  const [displayImageObj, setDisplayImageObj] = useState(null);
-  const [displayImage, setDisplayImage] = useState(null);
 
   useEffect(() => {
     if (project) {
@@ -107,8 +105,6 @@ const Canvas = ({
       img.src = selectedImage.file_path;
       img.onload = () => {
         setImageObj(img);
-        setDisplayImageObj(img);
-        setDisplayImage(selectedImage);
       };
       img.onerror = () => {
         console.error('Failed to load image:', selectedImage.file_path);
@@ -122,8 +118,6 @@ const Canvas = ({
             img.src = data.image.url;
             img.onload = () => {
               setImageObj(img);
-              setDisplayImageObj(img);
-              setDisplayImage(selectedImage);
             };
             img.onerror = () => {
               console.error('Failed to load image:', data.image.url);
@@ -135,18 +129,18 @@ const Canvas = ({
   }, [selectedImage]);
 
   useEffect(() => {
-    if (canvasAreaRef.current && displayImage) {
+    if (canvasAreaRef.current && selectedImage) {
       const { width, height } = canvasAreaRef.current.getBoundingClientRect();
-      const scaleX = width / displayImage.width;
-      const scaleY = height / displayImage.height;
+      const scaleX = width / selectedImage.width;
+      const scaleY = height / selectedImage.height;
       const newScale = Math.min(scaleX, scaleY) * 0.95;
       setScale(newScale);
       setOffset({
-        x: (width - displayImage.width * newScale) / 2,
-        y: (height - displayImage.height * newScale) / 2,
+        x: (width - selectedImage.width * newScale) / 2,
+        y: (height - selectedImage.height * newScale) / 2,
       });
     }
-  }, [displayImage, canvasAreaRef.current]);
+  }, [selectedImage, canvasAreaRef.current]);
 
   const handleStageMouseDown = (e) => {
     if (e.evt.button !== 0) return;
@@ -378,22 +372,6 @@ const Canvas = ({
     }
   };
 
-  // if (isProjectLoading || isLabelsLoading || isAnnotationsLoading) {
-  //   return (
-  //     <div className="canvas-layout">
-  //       <div className="canvas-loading-overlay">
-  //         <div className="loading-spinner"></div>
-  //         <p className="loading-message">
-  //           {isProjectLoading ? 'Loading project...' : 'Loading labels...' }
-  //         </p>
-  //         <div className="loading-progress">
-  //           <div className="loading-progress-fill"></div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="canvas-layout">
 
@@ -409,13 +387,13 @@ const Canvas = ({
         />
 
         <div ref={canvasAreaRef} onWheel={handleWheel}>
-          {!isLabelsLoading &&  <DrawingCanvas
+          {<DrawingCanvas
             project={project}
-            imageObj={displayImageObj}
+            imageObj={imageObj}
             selectedImage={selectedImage}
             scale={scale}
             offset={offset}
-            labels={labels}
+            labels={labels || []}
             annotations={annotations}
             drawingPoints={drawingPoints}
             projectType={projectType}

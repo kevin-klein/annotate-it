@@ -2,7 +2,7 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
 
   def generate_jwt
-    JWT.encode({user_id: id, exp: 1.day.from_now.to_i}, Rails.application.credentials.secret_key_base, "HS256")
+    JWT.encode({user_id: id, exp: 1.year.from_now.to_i}, Rails.application.credentials.secret_key_base, "HS256")
   end
 
   def generate_login_code

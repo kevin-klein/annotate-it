@@ -297,7 +297,6 @@ const Canvas = ({
   };
 
   const handleUpdateAnnotation = (updatedAnnotation) => {
-    console.log(updatedAnnotation)
     setAnnotations(prev =>
       prev.map(a => (a.id === updatedAnnotation.id ? {...a, ...updatedAnnotation} : a))
     );
@@ -387,7 +386,7 @@ const Canvas = ({
 
   return (
     <div className="canvas-layout">
-      
+
       <div className="canvas-area">
         <Toolbar
           scale={scale}
@@ -399,7 +398,7 @@ const Canvas = ({
           onExport={handleExport}
         />
 
-        <div class='' ref={canvasAreaRef} onWheel={handleWheel}>
+        <div ref={canvasAreaRef} onWheel={handleWheel}>
           <DrawingCanvas
             project={project}
             imageObj={imageObj}

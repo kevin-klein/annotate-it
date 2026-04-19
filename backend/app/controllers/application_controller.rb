@@ -9,10 +9,11 @@ class ApplicationController < ActionController::API
     if token
       begin
         decoded = JWT.decode(token, Rails.application.credentials.secret_key_base, true, {algorithm: "HS256"})
-        ap decoded
         @current_user = User.find(decoded.first["user_id"])
+      rescue JWT::ExpiredSignature
+        render json: { error: "Session expired", session_expired: true }, status: :unauthorized
       rescue JWT::DecodeError => e
-        render json: {error: "Invalid token"}, status: :unauthorized
+        render json: { error: "Invalid token", session_expired: false }, status: :unauthorized
       end
     end
   end

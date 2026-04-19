@@ -72,13 +72,15 @@ export const authService = {
   },
 
   // Logout user
-  logout: () => {
+  logout: async () => {
     localStorage.removeItem(TOKEN_KEY);
-    return fetch('/api/logout', { method: 'DELETE' });
+    try {
+      await fetch('/api/logout', { method: 'DELETE', headers: authService.getAuthHeader() });
+    } catch (e) {
+      // Ignore errors during logout — token may already be expired
+    }
+    window.location.href = '/login';
   },
-
-  // Get current authentication token
-  getToken: () => localStorage.getItem(TOKEN_KEY),
 
   // Check if user is authenticated
   isAuthenticated: () => !!localStorage.getItem(TOKEN_KEY),
@@ -90,6 +92,26 @@ export const authService = {
   },
 };
 
+export const handleUnauthorized = () => {
+  localStorage.removeItem('auth_token');
+  window.location.href = '/login';
+};
+
+export const safeFetch = async (url, options = {}) => {
+  const response = await fetch(url, options);
+  if (response.status === 401) {
+    handleUnauthorized();
+    const error = new Error('Unauthorized');
+    error.isUnauthorized = true;
+    throw error;
+  }
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
 // Update API service to include authentication headers
 export const authenticatedApi = {
   // Generic POST with auth
@@ -98,141 +120,88 @@ export const authenticatedApi = {
       'Content-Type': 'application/json',
       ...authService.getAuthHeader()
     };
-    return fetch(path, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    }).then(res => res.json());
+    return safeFetch(path, { method: 'POST', headers, body: JSON.stringify(data) });
   },
 
-  fetcher: async (url) => {
-    const headers = {
-      'Content-Type': 'application/json',
-      ...authService.getAuthHeader()
-    };
-
-    const response = await fetch(url, { headers });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  },
+  // SWR fetcher
+  fetcher: async (url) => safeFetch(url, { headers: authService.getAuthHeader() }),
 
   // Projects
-  getProjects: () => fetch('/api/projects', { headers: authService.getAuthHeader() }).then(res => res.json()),
+  getProjects: () => safeFetch('/api/projects', { headers: authService.getAuthHeader() }),
   createProject: (data) => {
     const headers = {
       'Content-Type': 'application/json',
       ...authService.getAuthHeader()
     };
-    return fetch('/api/projects', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    }).then(res => res.json());
+    return safeFetch('/api/projects', { method: 'POST', headers, body: JSON.stringify(data) });
   },
-  getProject: (id) => fetch(`/api/projects/${id}`, { headers: authService.getAuthHeader() }).then(res => res.json()),
+  getProject: (id) => safeFetch(`/api/projects/${id}`, { headers: authService.getAuthHeader() }),
   updateProject: (id, data) => {
     const headers = {
       'Content-Type': 'application/json',
       ...authService.getAuthHeader()
     };
-    return fetch(`/api/projects/${id}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(data),
-    }).then(res => res.json());
+    return safeFetch(`/api/projects/${id}`, { method: 'PUT', headers, body: JSON.stringify(data) });
   },
-  deleteProject: (id) => fetch(`/api/projects/${id}`, {
-    method: 'DELETE',
-    headers: authService.getAuthHeader()
-  }).then(res => res.json()),
-  getProjectStats: (id) => fetch(`/api/projects/${id}/stats`, { headers: authService.getAuthHeader() }).then(res => res.json()),
-  getProjectAnnotations: (id) => fetch(`/api/projects/${id}/annotations`, { headers: authService.getAuthHeader() }).then(res => res.json()),
+  deleteProject: (id) => safeFetch(`/api/projects/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
+  getProjectStats: (id) => safeFetch(`/api/projects/${id}/stats`, { headers: authService.getAuthHeader() }),
+  getProjectAnnotations: (id) => safeFetch(`/api/projects/${id}/annotations`, { headers: authService.getAuthHeader() }),
 
   // Labels
-  deleteLabel: (id) => fetch(`/api/labels/${id}`, {
-    method: 'DELETE',
-    headers: authService.getAuthHeader()
-  }).then(res => res.json()),
+  deleteLabel: (id) => safeFetch(`/api/labels/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
 
   // Datasets
-  getDatasets: () => fetch('/api/datasets', { headers: authService.getAuthHeader() }).then(res => res.json()),
-  getDataset: (id) => fetch(`/api/datasets/${id}`, { headers: authService.getAuthHeader() }).then(res => res.json()),
+  getDatasets: () => safeFetch('/api/datasets', { headers: authService.getAuthHeader() }),
+  getDataset: (id) => safeFetch(`/api/datasets/${id}`, { headers: authService.getAuthHeader() }),
   createDataset: (data) => {
     const headers = {
       'Content-Type': 'application/json',
       ...authService.getAuthHeader()
     };
-    return fetch('/api/datasets', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    }).then(res => res.json());
+    return safeFetch('/api/datasets', { method: 'POST', headers, body: JSON.stringify(data) });
   },
   updateDataset: (id, data) => {
     const headers = {
       'Content-Type': 'application/json',
       ...authService.getAuthHeader()
     };
-    return fetch(`/api/datasets/${id}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(data),
-    }).then(res => res.json());
+    return safeFetch(`/api/datasets/${id}`, { method: 'PUT', headers, body: JSON.stringify(data) });
   },
-  deleteDataset: (id) => fetch(`/api/datasets/${id}`, {
-    method: 'DELETE',
-    headers: authService.getAuthHeader()
-  }).then(res => res.json()),
+  deleteDataset: (id) => safeFetch(`/api/datasets/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
 
   // Images
   getImages: (params) => {
     const query = new URLSearchParams(params).toString();
-    return fetch(`/api/images${query ? `?${query}` : ''}`, { headers: authService.getAuthHeader() }).then(res => res.json());
+    return safeFetch(`/api/images${query ? `?${query}` : ''}`, { headers: authService.getAuthHeader() });
   },
-  getImage: (id) => fetch(`/api/images/${id}`, { headers: authService.getAuthHeader() }).then(res => res.json()),
+  getImage: (id) => safeFetch(`/api/images/${id}`, { headers: authService.getAuthHeader() }),
   getImageAnnotations: (id, params) => {
     const query = new URLSearchParams(params).toString();
-    return fetch(`/api/annotations?imageId=${id}${query ? `&${query}` : ''}`, { headers: authService.getAuthHeader() }).then(res => res.json());
+    return safeFetch(`/api/annotations?imageId=${id}${query ? `&${query}` : ''}`, { headers: authService.getAuthHeader() });
   },
-  deleteImage: (id) => fetch(`/api/images/${id}`, {
-    method: 'DELETE',
-    headers: authService.getAuthHeader()
-  }).then(res => res.json()),
+  deleteImage: (id) => safeFetch(`/api/images/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
 
   // Annotations
   getAnnotations: (params) => {
     const query = new URLSearchParams(params).toString();
-    return fetch(`/api/annotations${query ? `?${query}` : ''}`, { headers: authService.getAuthHeader() }).then(res => res.json());
+    return safeFetch(`/api/annotations${query ? `?${query}` : ''}`, { headers: authService.getAuthHeader() });
   },
-  getAnnotation: (id) => fetch(`/api/annotations/${id}`, { headers: authService.getAuthHeader() }).then(res => res.json()),
+  getAnnotation: (id) => safeFetch(`/api/annotations/${id}`, { headers: authService.getAuthHeader() }),
   createAnnotation: (data) => {
     const headers = {
       'Content-Type': 'application/json',
       ...authService.getAuthHeader()
     };
-    return fetch('/api/annotations', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    }).then(res => res.json());
+    return safeFetch('/api/annotations', { method: 'POST', headers, body: JSON.stringify(data) });
   },
   updateAnnotation: (id, data) => {
     const headers = {
       'Content-Type': 'application/json',
       ...authService.getAuthHeader()
     };
-    return fetch(`/api/annotations/${id}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(data),
-    }).then(res => res.json());
+    return safeFetch(`/api/annotations/${id}`, { method: 'PUT', headers, body: JSON.stringify(data) });
   },
-  deleteAnnotation: (id) => fetch(`/api/annotations/${id}`, {
-    method: 'DELETE',
-    headers: authService.getAuthHeader()
-  }).then(res => res.json()),
+  deleteAnnotation: (id) => safeFetch(`/api/annotations/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
 
   // Upload
   uploadImage: (file, datasetId) => {
@@ -240,9 +209,9 @@ export const authenticatedApi = {
     formData.append('image', file);
     if (datasetId) formData.append('datasetId', datasetId);
     const headers = authService.getAuthHeader();
-    return fetch('/api/upload', { method: 'POST', body: formData, headers }).then(res => res.json());
+    return safeFetch('/api/upload', { method: 'POST', body: formData, headers });
   },
 
   // Stats
-  getStats: () => fetch('/api/images/stats', { headers: authService.getAuthHeader() }).then(res => res.json()),
+  getStats: () => safeFetch('/api/images/stats', { headers: authService.getAuthHeader() }),
 };

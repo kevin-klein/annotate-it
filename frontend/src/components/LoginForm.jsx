@@ -90,7 +90,7 @@ const VerifyLoginCode = ({ email, onVerifySuccess, onCancel }) => {
     setError('');
 
     try {
-      await authService.verifyLoginCode(email, code);
+      const result = await authService.verifyLoginCode(email, code);
       onVerifySuccess?.();
       setLocation('/projects');
     } catch (err) {

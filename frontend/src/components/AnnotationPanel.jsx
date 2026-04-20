@@ -4,7 +4,8 @@ import LabelInput from './LabelInput';
 
 export default function AnnotationPanel ({ project,
   annotations, onDelete, label, onLabelChange,
-  labels, onSelectAnnotation, selectedAnnotationId }) {
+  labels, onSelectAnnotation, selectedAnnotationId,
+  projectId, api, onLabelAdded }) {
   return (
     <div className="annotations-panel">
       <div className="panel-header">
@@ -16,6 +17,9 @@ export default function AnnotationPanel ({ project,
             label={label}
             labels={labels}
             onLabelChange={onLabelChange}
+            projectId={projectId}
+            api={api}
+            onLabelAdded={onLabelAdded}
           />
         </div>
 

@@ -37,7 +37,7 @@ class LabelsController < ApplicationController
   def destroy
     @label.destroy!
 
-    render json: {}
+    head :no_content
   end
 
   private
@@ -49,6 +49,6 @@ class LabelsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def label_params
-    params.expect(label: [:project_id, :name, :color])
+    params.expect(label: [ :project_id, :name, :color ])
   end
 end

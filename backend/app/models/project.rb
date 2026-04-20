@@ -5,6 +5,6 @@ class Project < ApplicationRecord
     contrastive_learning: 3
   }
 
-  has_many :labels
-  has_many :images
+  has_many :labels, dependent: :destroy
+  has_many :images, dependent: :destroy
 end

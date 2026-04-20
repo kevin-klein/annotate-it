@@ -38,7 +38,7 @@ class ProjectsController < ApplicationController
   def destroy
     @project.destroy!
 
-    render json: {}
+    head :no_content
   end
 
   # GET /projects/:id/export
@@ -64,6 +64,6 @@ class ProjectsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def project_params
-    params.expect(project: [:name, :description, :annotation_type])
+    params.expect(project: [ :name, :description, :annotation_type ])
   end
 end

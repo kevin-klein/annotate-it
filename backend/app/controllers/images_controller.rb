@@ -57,7 +57,7 @@ class ImagesController < ApplicationController
   def destroy
     @image.destroy!
 
-    render json: {}
+    head :no_content
   end
 
   private
@@ -69,10 +69,11 @@ class ImagesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def image_params
-    params.expect(image: [:project_id, :image])
+    params.expect(image: [ :project_id, :image ])
   end
 
   def image_is_zip?
-    params[:image][:image].content_type == "application/x-zip-compressed"
+    file = params[:image]&.[](:image)
+    file&.content_type == "application/x-zip-compressed"
   end
 end

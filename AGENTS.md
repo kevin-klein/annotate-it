@@ -78,6 +78,40 @@ This document describes the REST API architecture used in the Rails annotation a
 - Parameters: `name`, `description`, `annotation_type`
 - Returns JSON representation of project
 
+## Frontend Overview
+
+The frontend is a React application built with Vite. It uses `konva` and `react-konva` for canvas-based annotations and `swr` for data fetching.
+
+### Directory Structure
+
+├── `src/`
+│   ├── `components/` - Reusable UI components
+│   ├── `context/` - React Context for state management
+│   ├── `hooks/` - Custom React hooks
+│   ├── `services/` - API interaction logic
+│   ├── `utils/` - Helper functions
+│   └── `App.jsx` - Main application component
+
+### Setup
+
+Install dependencies:
+
+```bash
+cd frontend && npm install
+```
+
+Run development server:
+
+```bash
+cd frontend && npm run dev
+```
+
+Build for production:
+
+```bash
+cd frontend && npm run build
+```
+
 ## API Communication
 
 The API uses Rails RESTful routing with JSON serialization. All endpoints are prefixed with `/api`. The system uses the following database tables:
@@ -109,4 +143,10 @@ Run with coverage:
 
 ```bash
 cd backend && bundle exec rails test:coverage
+```
+
+Run frontend tests using:
+
+```bash
+cd frontend && npm test
 ```

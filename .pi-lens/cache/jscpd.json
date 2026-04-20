@@ -1,0 +1,72 @@
+{
+  "success": true,
+  "clones": [
+    {
+      "fileA": "frontend/src/components/Sidebar.jsx",
+      "startA": 197,
+      "fileB": "frontend/src/components/Sidebar.jsx",
+      "startB": 133,
+      "lines": 62,
+      "tokens": 0
+    },
+    {
+      "fileA": "frontend/src/components/Sidebar.jsx",
+      "startA": 192,
+      "fileB": "frontend/src/components/Sidebar.jsx",
+      "startB": 106,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": "frontend/src/components/Sidebar.jsx",
+      "startA": 219,
+      "fileB": "frontend/src/components/Sidebar.jsx",
+      "startB": 133,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "frontend/src/components/Sidebar.jsx",
+      "startA": 229,
+      "fileB": "frontend/src/components/Sidebar.jsx",
+      "startB": 144,
+      "lines": 29,
+      "tokens": 0
+    },
+    {
+      "fileA": "frontend/src/components/ProjectSettings.jsx",
+      "startA": 121,
+      "fileB": "frontend/src/components/ProjectSettings.jsx",
+      "startB": 44,
+      "lines": 78,
+      "tokens": 0
+    },
+    {
+      "fileA": "frontend/src/components/ProjectSettings.jsx",
+      "startA": 99,
+      "fileB": "frontend/src/components/ProjectSettings.jsx",
+      "startB": 29,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "frontend/src/components/ProjectSettings.jsx",
+      "startA": 131,
+      "fileB": "frontend/src/components/ProjectSettings.jsx",
+      "startB": 29,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "frontend/src/components/Canvas.jsx",
+      "startA": 197,
+      "fileB": "frontend/src/components/Canvas.jsx",
+      "startB": 154,
+      "lines": 10,
+      "tokens": 0
+    }
+  ],
+  "duplicatedLines": 248,
+  "totalLines": 5843,
+  "percentage": 4.24
+}

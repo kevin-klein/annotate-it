@@ -418,6 +418,9 @@ const Canvas = ({
         onDelete={handleDeleteAnnotation}
         onSelectAnnotation={handleAnnotationSelect}
         selectedAnnotationId={selectedAnnotationId}
+        projectId={selectedProjectId}
+        api={api}
+        onLabelAdded={mutateLabels}
       />
     </div>
   );

@@ -451,6 +451,8 @@ body {
   display: flex;
   gap: 0.5rem;
   pointer-events: auto;
+  flex-direction: column;
+  width: 100%;
 }
 
 .tool-btn {

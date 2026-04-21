@@ -1,14 +1,25 @@
 import React from 'react';
 import AnnotationItem from './AnnotationItem';
 import LabelInput from './LabelInput';
+import Toolbar from "./Toolbar";
 
 export default function AnnotationPanel ({ project,
   annotations, onDelete, label, onLabelChange,
   labels, onSelectAnnotation, selectedAnnotationId,
-  projectId, api, onLabelAdded, toggleDone, finished }) {
+  projectId, api, onLabelAdded, toggleDone, finished, scale, onZoomIn, onZoomOut, projectType, setTool, handleExport, handleZoomIn, handleZoomOut, tool }) {
 
   return (
     <div className="annotations-panel">
+      <Toolbar
+					scale={scale}
+					onZoomIn={handleZoomIn}
+					onZoomOut={handleZoomOut}
+					projectType={projectType}
+					tool={tool}
+					onToolChange={setTool}
+					onExport={handleExport}
+				/>
+
       <div className="panel-header">
         <h3>Annotations ({annotations.length})</h3>
       </div>

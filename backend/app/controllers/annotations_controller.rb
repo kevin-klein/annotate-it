@@ -6,7 +6,7 @@ class AnnotationsController < ApplicationController
   def index
     @annotations = Annotation.where(image_id: params[:image_id])
 
-    render json: @annotations
+    render json: @annotations.as_json(methods: [:data])
   end
 
   # GET /annotations/1
@@ -19,10 +19,9 @@ class AnnotationsController < ApplicationController
     if annotation_params[:id].is_a?(Integer)
       @annotation = Annotation.find(annotation_params[:id])
       @annotation.update(annotation_params.except(:data))
-      @annotation.data = params[:annotation][:data] if params[:annotation].key?(:data)
+      @annotation.data = params[:annotation][:data] 
     else
-      ap annotation_params
-      @annotation = Annotation.new(annotation_params.except(:id, :data))
+      @annotation = Annotation.new(annotation_params.except(:id))
     end
 
     if @annotation.save
@@ -35,7 +34,7 @@ class AnnotationsController < ApplicationController
   # PATCH/PUT /annotations/1
   def update
     @annotation.update(annotation_params.except(:data))
-    @annotation.data = params[:annotation][:data] if params[:annotation].key?(:data)
+    @annotation.data = params[:annotation][:data]
 
     render json: @annotation
   rescue ActiveRecord::RecordInvalid => e
@@ -55,6 +54,8 @@ class AnnotationsController < ApplicationController
   end
 
   def annotation_params
-    params.require(:annotation).permit(:id, :image_id, :label_id)
+    params.require(:annotation).permit(:id, :image_id, :label_id, data: [[]]).tap do |whitelisted|
+      whitelisted[:data] = params[:annotation][:data] if params[:annotation][:data]
+    end
   end
 end

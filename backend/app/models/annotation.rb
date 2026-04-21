@@ -6,8 +6,6 @@ class Annotation < ApplicationRecord
   has_one :instance_segmentation_annotation, dependent: :destroy, autosave: false
   has_one :contrastive_learning_annotation, dependent: :destroy, autosave: false
 
-  before_validation :build_type_specific_record
-
   # Derive annotation type from the project (each project has a single type)
   def annotation_type
     image&.project&.annotation_type
@@ -18,15 +16,14 @@ class Annotation < ApplicationRecord
     return unless type
     case type
     when "object_detection"
-      self.object_detection_annotation ||= ObjectDetectionAnnotation.new
+      self.object_detection_annotation ||= ObjectDetectionAnnotation.new(annotation: self)
     when "instance_segmentation"
-      self.instance_segmentation_annotation ||= InstanceSegmentationAnnotation.new
+      self.instance_segmentation_annotation ||= InstanceSegmentationAnnotation.new(annotation: self)
     when "contrastive_learning"
-      self.contrastive_learning_annotation ||= ContrastiveLearningAnnotation.new
+      self.contrastive_learning_annotation ||= ContrastiveLearningAnnotation.new(annotation: self)
     end
   end
 
-  # Delegate data access to the appropriate type-specific association
   def data
     case annotation_type
     when "object_detection"
@@ -46,16 +43,20 @@ class Annotation < ApplicationRecord
   end
 
   def data=(value)
+    build_type_specific_record
+
     case annotation_type
     when "object_detection"
       if value.is_a?(Array) && value.size == 4
-        record = object_detection_annotation || build_object_detection_annotation
+        record = object_detection_annotation
         record.update!(
           xmin: value.map { |p| p[0] }.min,
           ymin: value.map { |p| p[1] }.min,
           xmax: value.map { |p| p[0] }.max,
           ymax: value.map { |p| p[1] }.max
         )
+      else
+        raise
       end
     when "instance_segmentation"
       record = instance_segmentation_annotation || build_instance_segmentation_annotation
@@ -63,6 +64,8 @@ class Annotation < ApplicationRecord
     when "contrastive_learning"
       record = contrastive_learning_annotation || build_contrastive_learning_annotation
       record.update!(contrastive_points: value) if value.is_a?(Array)
+    else
+      raise
     end
   end
 

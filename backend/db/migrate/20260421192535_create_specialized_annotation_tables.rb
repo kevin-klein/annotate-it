@@ -27,19 +27,25 @@ class CreateSpecializedAnnotationTables < ActiveRecord::Migration[8.1]
     # Add annotation_type column to annotations table
     add_column :annotations, :annotation_type, :string
 
+    rename_column :annotations, :data, :old_data
+
     # Migrate existing data from annotations.data to specialized tables
     Annotation.find_each do |annotation|
-      next unless annotation.data.is_a?(Array)
-      next unless annotation.image&.project
+      if annotation.old_data.nil?
+        annotation.destroy!
+        next
+      end
+      raise unless annotation.old_data.is_a?(Array)
+      raise unless annotation.image&.project
 
       project_type = annotation.image.project.annotation_type
 
       case project_type
       when "object_detection"
-        next unless annotation.data.size == 4
+        raise unless annotation.old_data.size == 4
 
-        xs = annotation.data.map { |p| p[0] }
-        ys = annotation.data.map { |p| p[1] }
+        xs = annotation.old_data.map { |p| p[0] }
+        ys = annotation.old_data.map { |p| p[1] }
 
         ObjectDetectionAnnotation.create!(
           annotation: annotation,
@@ -74,7 +80,7 @@ class CreateSpecializedAnnotationTables < ActiveRecord::Migration[8.1]
     end
 
     # Remove the old data column
-    remove_column :annotations, :data
+    remove_column :annotations, :old_data
   end
 
   def down

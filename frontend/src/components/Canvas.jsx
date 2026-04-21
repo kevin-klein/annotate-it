@@ -5,7 +5,6 @@ import { authenticatedApi as api, authService } from "../services/auth";
 import AnnotationPanel from "./AnnotationPanel";
 import DrawingCanvas from "./DrawingCanvas";
 import LabelInput from "./LabelInput";
-import Toolbar from "./Toolbar";
 
 // Helper functions extracted to reduce cognitive complexity
 const createScaledPosition = (e, offset, scale) => {
@@ -320,6 +319,8 @@ const Canvas = ({
 				);
 			}
 
+			console.log(newAnnotations)
+
 			setAnnotations(newAnnotations);
 			setAnnotationsVersion((v) => v + 1);
 		} catch (error) {
@@ -412,34 +413,26 @@ const Canvas = ({
 		setSelectedAnnotationId(id);
 	};
 
-	const handleZoomIn = () => setScale((s) => Math.min(s * 1.2, 3));
-	const handleZoomOut = () => setScale((s) => Math.max(s / 1.2, 0.1));
+	const handleZoomIn = () => {
+		console.log('zoom in')
+		setScale(s => Math.min(s * 1.2, 3));
+	}
+	const handleZoomOut = () => setScale(s => Math.max(s / 1.2, 0.1));
 
 	const handleWheel = (e) => {
 		e.preventDefault();
 
-		const stage = e.target.getStage();
-		if (!stage) return;
-
-		const oldScale = scale;
+		// Determine zoom direction based on scroll delta
 		const delta = e.deltaY > 0 ? -1 : 1;
 		const zoomFactor = 1.1;
-		const newScale = delta > 0
-			? Math.min(oldScale * zoomFactor, 3)
-			: Math.max(oldScale / zoomFactor, 0.1);
 
-		const pointerPoint = {
-			x: (stage.getPointerPosition().x - offset.x) / oldScale,
-			y: (stage.getPointerPosition().y - offset.y) / oldScale,
-		};
-
-		const newOffset = {
-			x: stage.getPointerPosition().x - pointerPoint.x * newScale,
-			y: stage.getPointerPosition().y - pointerPoint.y * newScale,
-		};
-
-		setScale(newScale);
-		setOffset(newOffset);
+		if (delta > 0) {
+		// Zoom in
+		setScale(s => Math.min(s * zoomFactor, 3));
+		} else {
+		// Zoom out
+		setScale(s => Math.max(s / zoomFactor, 0.1));
+		}
 	};
 
 	const toggleDone = async () => {
@@ -495,16 +488,6 @@ const Canvas = ({
 	return (
 		<div className="canvas-layout">
 			<div className="canvas-area">
-				<Toolbar
-					scale={scale}
-					onZoomIn={handleZoomIn}
-					onZoomOut={handleZoomOut}
-					projectType={projectType}
-					tool={tool}
-					onToolChange={setTool}
-					onExport={handleExport}
-				/>
-
 				<div
 					ref={canvasAreaRef}
 					onWheel={handleWheel}
@@ -546,6 +529,13 @@ const Canvas = ({
 				onLabelAdded={mutateLabels}
 				toggleDone={toggleDone}
 				finished={imageFinished}
+				scale={scale}
+				handleZoomIn={handleZoomIn}
+				handleZoomOut={handleZoomOut}
+				projectType={projectType}
+				tool={tool}
+				setTool={setTool}
+				handleExport={handleExport}
 			/>
 		</div>
 	);

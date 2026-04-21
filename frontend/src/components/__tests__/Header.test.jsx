@@ -34,7 +34,7 @@ describe("Header", () => {
 
 	test("renders project name when project data is available", () => {
 		useSWR.mockReturnValue({
-			data: { project: { name: "My Project", type: "object_detection" } },
+			data: { name: "My Project", annotation_type: "object_detection" },
 			error: null,
 		});
 		render(<Header {...defaultProps} />);
@@ -43,7 +43,7 @@ describe("Header", () => {
 
 	test("renders detection type badge", () => {
 		useSWR.mockReturnValue({
-			data: { project: { name: "Test", type: "object_detection" } },
+			data: { name: "Test", annotation_type: "object_detection" },
 			error: null,
 		});
 		render(<Header {...defaultProps} />);
@@ -52,7 +52,7 @@ describe("Header", () => {
 
 	test("renders segmentation type badge", () => {
 		useSWR.mockReturnValue({
-			data: { project: { name: "Test", type: "instance_segmentation" } },
+			data: { name: "Test", annotation_type: "instance_segmentation" },
 			error: null,
 		});
 		render(<Header {...defaultProps} />);
@@ -61,7 +61,7 @@ describe("Header", () => {
 
 	test("renders contrastive type badge", () => {
 		useSWR.mockReturnValue({
-			data: { project: { name: "Test", type: "contrastive_learning" } },
+			data: { name: "Test", annotation_type: "contrastive_learning" },
 			error: null,
 		});
 		render(<Header {...defaultProps} />);
@@ -70,7 +70,7 @@ describe("Header", () => {
 
 	test("renders back button", () => {
 		useSWR.mockReturnValue({
-			data: { project: { name: "Test", type: "object_detection" } },
+			data: { name: "Test", annotation_type: "object_detection" },
 			error: null,
 		});
 		render(<Header {...defaultProps} />);
@@ -84,7 +84,7 @@ describe("Header", () => {
 		}));
 		jest.isolateModules(() => {
 			useSWR.mockReturnValue({
-				data: { project: { name: "Test", type: "object_detection" } },
+				data: { name: "Test", annotation_type: "object_detection" },
 				error: null,
 			});
 			const { default: HeaderComp } = require("../Header");

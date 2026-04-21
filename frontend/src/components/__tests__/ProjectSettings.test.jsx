@@ -39,7 +39,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: null, mutate: jest.fn(), isLoading: true, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: true,
 				error: null,
@@ -60,7 +60,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -81,7 +81,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -102,7 +102,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -125,7 +125,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -149,7 +149,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -170,7 +170,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -196,7 +196,7 @@ describe("ProjectSettings", () => {
 					error: null,
 				};
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -222,7 +222,7 @@ describe("ProjectSettings", () => {
 					error: null,
 				};
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -243,7 +243,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -265,7 +265,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "instance_segmentation" },
+				data: { annotation_type: "instance_segmentation" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -286,7 +286,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "contrastive_learning" },
+				data: { annotation_type: "contrastive_learning" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -307,7 +307,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "contrastive_learning" },
+				data: { annotation_type: "contrastive_learning" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -328,7 +328,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -349,7 +349,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -370,7 +370,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -391,7 +391,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -413,7 +413,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -444,7 +444,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -470,7 +470,7 @@ describe("ProjectSettings", () => {
 					error: null,
 				};
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -498,7 +498,7 @@ describe("ProjectSettings", () => {
 					error: null,
 				};
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -527,7 +527,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -581,7 +581,7 @@ describe("ProjectSettings", () => {
 					error: new Error("Labels error"),
 				};
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,
@@ -602,7 +602,7 @@ describe("ProjectSettings", () => {
 			if (key?.includes("labels"))
 				return { data: [], mutate: jest.fn(), isLoading: false, error: null };
 			return {
-				data: { type: "object_detection" },
+				data: { annotation_type: "object_detection" },
 				mutate: jest.fn(),
 				isLoading: false,
 				error: null,

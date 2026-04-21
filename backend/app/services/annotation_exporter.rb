@@ -11,14 +11,14 @@ class AnnotationExporter
         'xsi:noNamespaceSchemaLocation' => 'annotation.xsd'
       ) do
         xml.folder('project')
-        xml.filename(File.basename(annotation.image.original_filename))
+        xml.filename(File.basename(annotation.image.image.original_filename))
         xml.source do
           xml.database('AnnotationDB')
         end
         xml.size do
-          xml.width(annotation.image.width)
-          xml.height(annotation.image.height)
-          xml.depth(annotation.image.depth || 3)
+          xml.width(annotation.image.image.metadata[:width])
+          xml.height(annotation.image.image.metadata[:height])
+          xml.depth(annotation.image.image.metadata[:depth] || 3)
         end
         xml.segmented(0)
         

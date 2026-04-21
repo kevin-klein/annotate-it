@@ -1,4 +1,5 @@
 class LabelsController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_label, only: %i[show update destroy]
 
   # GET /labels
@@ -20,7 +21,7 @@ class LabelsController < ApplicationController
     if @label.save
       render json: @label, status: :created, location: @label
     else
-      render json: @label.errors, status: :unprocessable_content
+      render json: @label.errors, status: :unprocessable_entity
     end
   end
 
@@ -29,7 +30,7 @@ class LabelsController < ApplicationController
     if @label.update(label_params)
       render json: @label
     else
-      render json: @label.errors, status: :unprocessable_content
+      render json: @label.errors, status: :unprocessable_entity
     end
   end
 

@@ -11,7 +11,6 @@ describe('AnnotationItem', () => {
   ];
   const mockAnnotation = {
     id: 101,
-    type: 'object_detection',
     label_id: 1,
     data: [[10.5, 20.7]],
   };
@@ -54,9 +53,9 @@ describe('AnnotationItem', () => {
   test('renders correct icon for object_detection', () => {
     render(
       <AnnotationItem
-        project={mockProject}
+        project={{ ...mockProject, annotation_type: 'object_detection' }}
         labels={mockLabels}
-        annotation={{ ...mockAnnotation, type: 'object_detection' }}
+        annotation={mockAnnotation}
         onDelete={mockOnDelete}
         onSelect={mockOnSelect}
         isSelected={false}
@@ -68,9 +67,9 @@ describe('AnnotationItem', () => {
   test('renders correct icon for instance_segmentation', () => {
     render(
       <AnnotationItem
-        project={mockProject}
+        project={{ ...mockProject, annotation_type: 'instance_segmentation' }}
         labels={mockLabels}
-        annotation={{ ...mockAnnotation, type: 'instance_segmentation' }}
+        annotation={mockAnnotation}
         onDelete={mockOnDelete}
         onSelect={mockOnSelect}
         isSelected={false}
@@ -82,9 +81,9 @@ describe('AnnotationItem', () => {
   test('renders correct icon for contrastive_learning', () => {
     render(
       <AnnotationItem
-        project={mockProject}
+        project={{ ...mockProject, annotation_type: 'contrastive_learning' }}
         labels={mockLabels}
-        annotation={{ ...mockAnnotation, type: 'contrastive_learning' }}
+        annotation={mockAnnotation}
         onDelete={mockOnDelete}
         onSelect={mockOnSelect}
         isSelected={false}
@@ -96,9 +95,9 @@ describe('AnnotationItem', () => {
   test('renders default icon for unknown type', () => {
     render(
       <AnnotationItem
-        project={mockProject}
+        project={{ ...mockProject, annotation_type: 'unknown' }}
         labels={mockLabels}
-        annotation={{ ...mockAnnotation, type: 'unknown' }}
+        annotation={mockAnnotation}
         onDelete={mockOnDelete}
         onSelect={mockOnSelect}
         isSelected={false}

@@ -16,9 +16,8 @@ class User < ApplicationRecord
 
   def valid_login_code?(code)
     return false unless login_code && login_code_expiry
-    return false unless login_code == code
     return false if login_code_expiry < Time.now
-    true
+    ActiveSupport::SecurityUtils.secure_compare(login_code, code)
   end
 
   def clear_login_code

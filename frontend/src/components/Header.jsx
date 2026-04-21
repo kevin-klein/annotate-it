@@ -35,7 +35,7 @@ const Header = ({ activeView, selectedProjectId, onBackToProjects }) => {
         <div className="logo-icon">AI</div>
         <span>Annotation Studio</span>
       </div>
-      {projectData && projectData.project && (
+      {projectData && (
         <div className="project-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button
@@ -45,11 +45,11 @@ const Header = ({ activeView, selectedProjectId, onBackToProjects }) => {
             >
               ←
             </button>
-            <span className="project-name">📁 {projectData.project.name}</span>
-            <span className={`project-type-badge type-${projectData.project.type}`}>
-              {projectData.project.type === 'object_detection' && '🔲 Detection'}
-              {projectData.project.type === 'instance_segmentation' && '🔷 Segmentation'}
-              {projectData.project.type === 'contrastive_learning' && '⚖️ Contrastive'}
+            <span className="project-name">📁 {projectData.name}</span>
+            <span className={`project-type-badge type-${projectData.annotation_type}`}>
+              {projectData.annotation_type === 'object_detection' && '🔲 Detection'}
+              {projectData.annotation_type === 'instance_segmentation' && '🔷 Segmentation'}
+              {projectData.annotation_type === 'contrastive_learning' && '⚖️ Contrastive'}
             </span>
           </div>
         </div>

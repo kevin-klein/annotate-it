@@ -60,8 +60,8 @@ describe('Sidebar Component', () => {
 
   test('renders image list and calls onSelectImage when an image is clicked', () => {
     const mockImages = [
-      { id: 'img-1', original_name: 'image1.png', width: 100, height: 100, created_at: '2023-01-01T00:00:00Z' },
-      { id: 'img-2', original_name: 'image2.png', width: 200, height: 200, created_at: '2023-01-02T00:00:00Z' },
+      { id: 'img-1', file_path: '/uploads/image1.png', width: 100, height: 100, created_at: '2023-01-01T00:00:00Z' },
+      { id: 'img-2', file_path: '/uploads/image2.png', width: 200, height: 200, created_at: '2023-01-02T00:00:00Z' },
     ];
     useSWR.mockReturnValue({ data: mockImages, mutate: jest.fn() });
     render(<Sidebar {...defaultProps} />);

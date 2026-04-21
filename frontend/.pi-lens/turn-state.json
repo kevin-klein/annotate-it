@@ -139,12 +139,12 @@
     "src/components/DrawingCanvas.jsx": {
       "modifiedRanges": [
         {
-          "start": 84,
-          "end": 84
+          "start": 1,
+          "end": 307
         }
       ],
-      "importsChanged": false,
-      "lastEdit": "2026-04-20T11:06:21.473Z"
+      "importsChanged": true,
+      "lastEdit": "2026-04-20T16:16:30.717Z"
     },
     "src/components/ProjectView.jsx": {
       "modifiedRanges": [
@@ -175,9 +175,39 @@
       ],
       "importsChanged": false,
       "lastEdit": "2026-04-20T14:16:49.269Z"
+    },
+    "src/main.jsx": {
+      "modifiedRanges": [
+        {
+          "start": 6,
+          "end": 6
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-04-20T15:47:52.704Z"
+    },
+    "src/components/Sidebar.jsx": {
+      "modifiedRanges": [
+        {
+          "start": 6,
+          "end": 74
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-04-20T16:04:05.492Z"
+    },
+    "src/components/Canvas.jsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 467
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-04-20T16:14:11.712Z"
     }
   },
   "turnCycles": 0,
   "maxCycles": 3,
-  "lastUpdated": "2026-04-20T14:16:49.269Z"
+  "lastUpdated": "2026-04-20T16:16:30.717Z"
 }

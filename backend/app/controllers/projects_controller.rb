@@ -21,7 +21,7 @@ class ProjectsController < ApplicationController
     if @project.save
       render json: @project, status: :created, location: @project
     else
-      render json: @project.errors, status: :unprocessable_content
+      render json: @project.errors, status: :unprocessable_entity
     end
   end
 
@@ -30,7 +30,7 @@ class ProjectsController < ApplicationController
     if @project.update(project_params)
       render json: @project
     else
-      render json: @project.errors, status: :unprocessable_content
+      render json: @project.errors, status: :unprocessable_entity
     end
   end
 

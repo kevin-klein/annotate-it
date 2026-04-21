@@ -3,26 +3,96 @@ import useSWR from 'swr';
 import UploadModal from './UploadModal';
 import { authenticatedApi as api } from '../services/auth';
 
-const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, saveStatus, isSaving }) => {
+const ImageList = ({ images, selectedImage, onSelectImage, filter }) => {
+  const filteredImages = images.filter((image) => {
+    if (filter === 'finished') return image.finished;
+    if (filter === 'not_finished') return !image.finished;
+    return true;
+  });
+
+  if (!filteredImages || filteredImages.length === 0) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-icon">📷</div>
+        <div className="empty-state-title">No images yet</div>
+        <div className="empty-state-desc">Add images to start annotating</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="annotation-list" style={{ maxHeight: 800 }}>
+      {filteredImages.map(image => (
+        <div
+          key={image.id}
+          className={`sidebar-item ${selectedImage?.id === image.id ? 'active' : ''}`}
+          onClick={() => onSelectImage(image)}
+        >
+          <div className="sidebar-item-header">
+            <div className="sidebar-item-title">{image.original_name}</div>
+            {image.finished && (
+              <span style={{ fontSize: '0.75rem' }}>✓</span>
+            )}
+          </div>
+          <div className="sidebar-item-meta">
+            <span>{image.width}x{image.height}</span>
+            <span>{image.created_at.split('T')[0]}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const FilterBar = ({ filter, onFilterChange }) => {
+  const filterButtons = [
+    { key: 'all', label: 'All' },
+    { key: 'finished', label: 'Finished' },
+    { key: 'not_finished', label: 'Not Finished' },
+  ];
+
+  return (
+    <div style={{ marginBottom: '0.5rem', display: 'flex', gap: '4px', background: 'var(--bg-primary)', borderRadius: '6px', padding: '3px' }}>
+      {filterButtons.map(btn => (
+        <button
+          key={btn.key}
+          className="tool-btn"
+          onClick={() => onFilterChange(btn.key)}
+          style={{
+            flex: 1,
+            padding: '6px 8px',
+            fontSize: '0.7rem',
+            fontWeight: 500,
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            background: filter === btn.key ? 'var(--accent-primary)' : 'transparent',
+            color: filter === btn.key ? 'var(--bg-primary)' : 'var(--text-secondary)',
+          }}
+        >
+          {btn.label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, saveStatus, isSaving, mutateImages }) => {
   const [uploading, setUploading] = React.useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState(null);
+  const [imageFilter, setImageFilter] = useState('all');
 
   // Fetch images for the selected project
-  const { data: imagesData, mutate: mutateImages } = useSWR(
+  const { data: imagesData, error: imagesError } = useSWR(
     selectedProjectId ? `/api/images?project_id=${selectedProjectId}` : null,
     api.fetcher,
     { dedupingInterval: 5000 }
   );
 
-  // Fetch stats
-  // const { data: stats } = useSWR(
-  //   selectedProjectId ? `/api/images/stats?projectId=${selectedProjectId}` : null,
-  //   fetcher
-  // );
-  const stats = null
-
+  const stats = null;
   const images = imagesData || [];
 
   const handleUpload = (file, onProgress, onError) => {
@@ -33,7 +103,6 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, 
     formData.append('image[image]', file);
     formData.append('image[project_id]', selectedProjectId);
 
-    // Use XMLHttpRequest for progress tracking
     const xhr = new XMLHttpRequest();
 
     xhr.upload.addEventListener('progress', (e) => {
@@ -97,6 +166,18 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, 
           <div className="sidebar-content">
             {/* Upload Section */}
             <div style={{ marginBottom: '1rem' }}>
+              {imagesError && (
+                <div className="upload-error" style={{ marginBottom: '0.5rem' }}>
+                  <span>Failed to load images</span>
+                  <button
+                    className="error-retry-btn"
+                    onClick={() => mutateImages()}
+                    style={{ marginLeft: '0.5rem', fontSize: '0.8rem', padding: '2px 8px' }}
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
               <button
                 className="upload-btn"
                 onClick={() => setShowUploadModal(true)}
@@ -105,58 +186,16 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, 
               </button>
             </div>
 
-            {/* Statistics */}
-            {stats && (
-              <div style={{ marginBottom: '1rem' }}>
-                <div className="sidebar-item-meta" style={{ marginBottom: '0.5rem' }}>
-                  <span>Statistics</span>
-                </div>
-                <div className="grid-stats">
-                  <div className="stat-card">
-                    <div className="stat-card-value">{stats.total_images || 0}</div>
-                    <div className="stat-card-label">Images</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-card-value">{stats.object_detection_count || 0}</div>
-                    <div className="stat-card-label">Objects</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-card-value">{stats.segmentation_count || 0}</div>
-                    <div className="stat-card-label">Segments</div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Filter */}
+            <FilterBar filter={imageFilter} onFilterChange={setImageFilter} />
 
             {/* Image List */}
-            {images && images.length > 0 && (
-              <div className="annotation-list" style={{maxHeight: 800}}>
-                {images.map(image => (
-                  <div
-                    key={image.id}
-                    className={`sidebar-item ${selectedImage?.id === image.id ? 'active' : ''}`}
-                    onClick={() => onSelectImage(image)}
-                  >
-                    <div className="sidebar-item-header">
-                      <div className="sidebar-item-title">{image.original_name}</div>
-                    </div>
-                    <div className="sidebar-item-meta">
-                      <span>{image.id}</span>
-                      <span>{image.width}x{image.height}</span>
-                      <span>{image.created_at.split('T')[0]}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {(!images || images.length === 0) && (
-              <div className="empty-state">
-                <div className="empty-state-icon">📷</div>
-                <div className="empty-state-title">No images yet</div>
-                <div className="empty-state-desc">Add images to start annotating</div>
-              </div>
-            )}
+            <ImageList
+              images={images}
+              selectedImage={selectedImage}
+              onSelectImage={onSelectImage}
+              filter={imageFilter}
+            />
 
             {/* Save progress overlay */}
             {isSaving && (
@@ -184,6 +223,18 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, 
           </div>
           <div className="sidebar-content" style={{ pointerEvents: isSaving ? 'none' : 'auto' }}>
             {/* Quick Upload */}
+            {imagesError && (
+              <div className="upload-error" style={{ marginBottom: '0.5rem' }}>
+                <span>Failed to load images</span>
+                <button
+                  className="error-retry-btn"
+                  onClick={() => mutateImages()}
+                  style={{ marginLeft: '0.5rem', fontSize: '0.8rem', padding: '2px 8px' }}
+                >
+                  Retry
+                </button>
+              </div>
+            )}
             <button
               className="upload-btn"
               onClick={() => setShowUploadModal(true)}
@@ -191,57 +242,16 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, 
               + Add Image
             </button>
 
-            {/* Statistics */}
-            {stats && (
-              <div style={{ marginBottom: '1rem' }}>
-                <div className="sidebar-item-meta" style={{ marginBottom: '0.5rem' }}>
-                  <span>Statistics</span>
-                </div>
-                <div className="grid-stats">
-                  <div className="stat-card">
-                    <div className="stat-card-value">{stats.total_images || 0}</div>
-                    <div className="stat-card-label">Images</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-card-value">{stats.object_detection_count || 0}</div>
-                    <div className="stat-card-label">Objects</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-card-value">{stats.segmentation_count || 0}</div>
-                    <div className="stat-card-label">Segments</div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Filter */}
+            <FilterBar filter={imageFilter} onFilterChange={setImageFilter} />
 
             {/* Image List */}
-            {images && images.length > 0 && (
-              <div className="annotation-list">
-                {images.map(image => (
-                  <div
-                    key={image.id}
-                    className={`sidebar-item ${selectedImage?.id === image.id ? 'active' : ''}`}
-                    onClick={() => onSelectImage(image)}
-                  >
-                    <div className="sidebar-item-header">
-                      <div className="sidebar-item-title">{image.original_name}</div>
-                    </div>
-                    <div className="sidebar-item-meta">
-                      <span>{image.width}x{image.height}</span>
-                      <span>{image.created_at.split('T')[0]}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {(!images || images.length === 0) && (
-              <div className="empty-state">
-                <div className="empty-state-icon">📷</div>
-                <div className="empty-state-title">No images yet</div>
-                <div className="empty-state-desc">Add images to start annotating</div>
-              </div>
-            )}
+            <ImageList
+              images={images}
+              selectedImage={selectedImage}
+              onSelectImage={onSelectImage}
+              filter={imageFilter}
+            />
 
             {/* Save progress overlay */}
             {isSaving && (

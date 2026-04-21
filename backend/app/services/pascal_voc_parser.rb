@@ -56,6 +56,8 @@ class PascalVocParser
   end
 
   def bounding_box_to_points(bbox)
+    return nil if [bbox[:xmin], bbox[:ymin], bbox[:xmax], bbox[:ymax]].any?(&:nil?)
+
     [
       [bbox[:xmin], bbox[:ymin]],
       [bbox[:xmax], bbox[:ymin]],

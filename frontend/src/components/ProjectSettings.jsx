@@ -157,7 +157,7 @@ const ProjectSettings = ({ projectId, onClose, onSave }) => {
 		);
 	}
 
-	const projectType = project?.type || "object_detection";
+	const projectType = project?.annotation_type || "object_detection";
 
 	return (
 		<div className="modal-overlay" onClick={onClose}>

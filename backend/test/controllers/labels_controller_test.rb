@@ -15,7 +15,7 @@ class LabelsControllerTest < ActionDispatch::IntegrationTest
   test "should create label" do
     token = valid_token(@user)
     assert_difference("Label.count") do
-      post labels_url, headers: { "Authorization" => "Bearer #{token}" }, params: { label: { color: @label.color, name: @label.name, project_id: @label.project_id } }, as: :json
+      post labels_url, headers: { "Authorization" => "Bearer #{token}" }, params: { label: { color: @label.color, name: "unique_test_label", project_id: @label.project_id } }, as: :json
     end
 
     assert_response :created

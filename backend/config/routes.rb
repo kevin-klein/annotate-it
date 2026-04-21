@@ -2,7 +2,11 @@ Rails.application.routes.draw do
   scope :api do
     resources :annotations
     resources :labels
-    resources :images
+    resources :images do
+      member do
+        post :finish
+      end
+    end
     resources :projects do
       get :export, on: :member
     end

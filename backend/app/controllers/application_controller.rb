@@ -14,6 +14,8 @@ class ApplicationController < ActionController::API
         render json: { error: "Session expired", session_expired: true }, status: :unauthorized
       rescue JWT::DecodeError => e
         render json: { error: "Invalid token", session_expired: false }, status: :unauthorized
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "Session expired", session_expired: true }, status: :unauthorized
       end
     end
   end

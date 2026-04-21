@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  annotation: one
+  xmin: 10
+  ymin: 20
+  xmax: 100
+  ymax: 200
+
+two:
+  annotation: two
+  xmin: 5
+  ymin: 15
+  xmax: 95
+  ymax: 185

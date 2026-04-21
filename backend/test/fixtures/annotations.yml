@@ -2,10 +2,8 @@
 
 one:
   image: one
-  data: 
   label: one
 
 two:
   image: two
-  data: 
   label: two

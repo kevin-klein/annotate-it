@@ -1,22 +1,22 @@
 export default function ProjectInfo({ project, onBack }) {
   if (!project) return null;
 
-  const getTypeLabel = (type) => {
+  const getTypeLabel = (annotationType) => {
     const labels = {
       object_detection: 'Object Detection',
       instance_segmentation: 'Instance Segmentation',
       contrastive_learning: 'Contrastive Learning'
     };
-    return labels[type] || type;
+    return labels[annotationType] || annotationType;
   };
 
-  const getTypeColor = (type) => {
+  const getTypeColor = (annotationType) => {
     const colors = {
       object_detection: '#00d4aa',
       instance_segmentation: '#ff6b6b',
       contrastive_learning: '#4ecdc4'
     };
-    return colors[type] || '#0a84ff';
+    return colors[annotationType] || '#0a84ff';
   };
 
   return (
@@ -29,9 +29,9 @@ export default function ProjectInfo({ project, onBack }) {
           <h2>{project.name}</h2>
           <span 
             className="project-type-badge"
-            style={{ backgroundColor: getTypeColor(project.type) }}
+            style={{ backgroundColor: getTypeColor(project.annotation_type) }}
           >
-            {getTypeLabel(project.type)}
+            {getTypeLabel(project.annotation_type)}
           </span>
         </div>
       </div>

@@ -151,7 +151,7 @@ const DrawingCanvas = ({
 			);
 		}
 
-		if (project.type === "instance_segmentation") {
+		if (project.annotation_type === "instance_segmentation") {
 			const points = annotation.data;
 			if (!points || points.length < 3) return null;
 
@@ -178,7 +178,7 @@ const DrawingCanvas = ({
 			);
 		}
 
-		if (project.type === "contrastive_learning") {
+		if (project.annotation_type === "contrastive_learning") {
 			const points = annotation.metadata?.contrastivePoints || [];
 			return (
 				<React.Fragment key={annotation.id}>
@@ -264,13 +264,15 @@ const DrawingCanvas = ({
 		return null;
 	};
 
-	if (!selectedImage) {
+	if (!selectedImage || !project) {
 		return (
 			<div className="canvas-container">
 				<div className="empty-state">
-					<div className="empty-state-title">Select an image</div>
+					<div className="empty-state-title">
+						{!project ? "Loading..." : "Select an image"}
+					</div>
 					<div className="empty-state-desc">
-						Choose an image from the sidebar to start annotating
+						{!project ? "Loading project data..." : "Choose an image from the sidebar to start annotating"}
 					</div>
 				</div>
 			</div>

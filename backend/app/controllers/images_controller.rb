@@ -1,5 +1,6 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: %i[show update destroy]
+  before_action :authenticate_user!
+  before_action :set_image, only: %i[show update destroy finish]
 
   # GET /images
   def index
@@ -12,7 +13,8 @@ class ImagesController < ApplicationController
         height: image.image.metadata[:height],
         created_at: image.created_at,
         updated_at: image.updated_at,
-        file_path: rails_blob_url(image.image)
+        file_path: rails_blob_url(image.image),
+        finished: image.finished
       }
     end
 
@@ -39,7 +41,7 @@ class ImagesController < ApplicationController
       if @image.save
         render json: @image, status: :created, location: @image
       else
-        render json: @image.errors, status: :unprocessable_content
+        render json: @image.errors, status: :unprocessable_entity
       end
     end
   end
@@ -49,13 +51,20 @@ class ImagesController < ApplicationController
     if @image.update(image_params)
       render json: @image
     else
-      render json: @image.errors, status: :unprocessable_content
+      render json: @image.errors, status: :unprocessable_entity
     end
   end
 
   # DELETE /images/1
   def destroy
     @image.destroy!
+
+    head :no_content
+  end
+
+  def finish
+    @image.finished = !@image.finished
+    @image.save!
 
     head :no_content
   end

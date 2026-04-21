@@ -74,7 +74,7 @@ jest.mock("../Sidebar", () => {
 						onClick={() => onSelectImage(img)}
 					>
 						<span className="sidebar-item-title">
-							{img.original_name || img.id}
+							{img.file_path?.split('/').pop() || img.id}
 						</span>
 					</div>
 				))}
@@ -92,7 +92,7 @@ describe("ProjectView", () => {
 
 	// Stable mock data to prevent infinite re-renders from new object references
 	const projectResponse = {
-		data: { project: { type: "object_detection" } },
+		data: { annotation_type: "object_detection" },
 		mutate: jest.fn(),
 		isLoading: false,
 		error: null,
@@ -117,8 +117,8 @@ describe("ProjectView", () => {
 	};
 	const imagesWithTwo = {
 		data: [
-			{ id: "img-1", original_name: "photo1.jpg", width: 100, height: 100 },
-			{ id: "img-2", original_name: "photo2.jpg", width: 200, height: 200 },
+			{ id: "img-1", file_path: "/uploads/photo1.jpg", width: 100, height: 100 },
+			{ id: "img-2", file_path: "/uploads/photo2.jpg", width: 200, height: 200 },
 		],
 		mutate: jest.fn(),
 		isLoading: false,
@@ -126,7 +126,7 @@ describe("ProjectView", () => {
 	};
 	const imagesWithPhoto = {
 		data: [
-			{ id: "img-1", original_name: "photo.jpg", width: 100, height: 100 },
+			{ id: "img-1", file_path: "/uploads/photo.jpg", width: 100, height: 100 },
 		],
 		mutate: jest.fn(),
 		isLoading: false,

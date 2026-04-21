@@ -5,7 +5,8 @@ import LabelInput from './LabelInput';
 export default function AnnotationPanel ({ project,
   annotations, onDelete, label, onLabelChange,
   labels, onSelectAnnotation, selectedAnnotationId,
-  projectId, api, onLabelAdded }) {
+  projectId, api, onLabelAdded, toggleDone, finished }) {
+
   return (
     <div className="annotations-panel">
       <div className="panel-header">
@@ -21,6 +22,19 @@ export default function AnnotationPanel ({ project,
             api={api}
             onLabelAdded={onLabelAdded}
           />
+          <button
+            onClick={toggleDone}
+            className='tool-btn'
+            style={{
+              backgroundColor: finished ? 'var(--success)' : 'transparent',
+              color: finished ? 'var(--bg-primary)' : 'var(--text-secondary)',
+              border: finished ? 'none' : '1px solid var(--border-secondary)',
+              fontWeight: 500,
+              flex: 1,
+            }}
+          >
+            {finished ? '✓ DONE' : 'MARK DONE'}
+          </button>
         </div>
 
         <div className="annotation-list">

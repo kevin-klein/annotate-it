@@ -46,14 +46,12 @@ export default function ProjectSelection() {
         annotation_type: selectedType
       });
 
-      if (response.success) {
-        setShowCreate(false);
-        setNewProjectName('');
-        setNewProjectDesc('');
-        setSelectedType(null);
-        mutate();
-        navigate(`/project/${response.project.id}/images`);
-      }
+      setShowCreate(false);
+      setNewProjectName('');
+      setNewProjectDesc('');
+      setSelectedType(null);
+      mutate();
+      navigate(`/project/${response.id}/images`);
     } catch (error) {
       console.error('Error creating project:', error);
     }
@@ -101,10 +99,10 @@ export default function ProjectSelection() {
               className="project-card"
               onClick={() => handleProjectClick(project)}
             >
-              <div className="project-icon">{getProjectIcon(project.type)}</div>
+              <div className="project-icon">{getProjectIcon(project.annotation_type)}</div>
               <div className="project-info">
                 <h4>{project.name}</h4>
-                <p className="project-type">{getProjectTypeLabel(project.type)}</p>
+                <p className="project-type">{getProjectTypeLabel(project.annotation_type)}</p>
                 {project.description && <p className="project-desc">{project.description}</p>}
                 <span
                   className="btn-settings"
@@ -198,20 +196,20 @@ export default function ProjectSelection() {
   );
 }
 
-function getProjectIcon(type) {
+function getProjectIcon(annotationType) {
   const icons = {
     object_detection: '🔲',
     instance_segmentation: '🔷',
     contrastive_learning: '⚖️'
   };
-  return icons[type] || '📁';
+  return icons[annotationType] || '📁';
 }
 
-function getProjectTypeLabel(type) {
+function getProjectTypeLabel(annotationType) {
   const labels = {
     object_detection: 'Object Detection',
     instance_segmentation: 'Instance Segmentation',
     contrastive_learning: 'Contrastive Learning'
   };
-  return labels[type] || type;
+  return labels[annotationType] || annotationType;
 }

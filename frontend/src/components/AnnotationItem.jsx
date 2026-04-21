@@ -12,6 +12,7 @@ const AnnotationItem = ({ project, labels, annotation, onDelete, onSelect, isSel
 
   const renderCoords = () => {
     if (!annotation.data) return null;
+    if (annotation.data.length === 0) return null;
 
     if (project.annotation_type === 'object_detection') {
       return (
@@ -42,7 +43,7 @@ const AnnotationItem = ({ project, labels, annotation, onDelete, onSelect, isSel
     >
       <div className="annotation-info">
         <span className="annotation-type">
-          {getIconForType(annotation.type)}
+          {getIconForType(project?.annotation_type)}
         </span>
         <span className="annotation-label">
           {labels.find(label => label.id === annotation.label_id)?.name || 'Untitled'}

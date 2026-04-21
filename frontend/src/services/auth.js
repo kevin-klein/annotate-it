@@ -155,30 +155,9 @@ export const authenticatedApi = {
     return safeFetch(`/api/projects/${id}`, { method: 'PUT', headers, body: JSON.stringify(data) });
   },
   deleteProject: (id) => safeFetch(`/api/projects/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
-  getProjectStats: (id) => safeFetch(`/api/projects/${id}/stats`, { headers: authService.getAuthHeader() }),
-  getProjectAnnotations: (id) => safeFetch(`/api/projects/${id}/annotations`, { headers: authService.getAuthHeader() }),
 
   // Labels
   deleteLabel: (id) => safeFetch(`/api/labels/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
-
-  // Datasets
-  getDatasets: () => safeFetch('/api/datasets', { headers: authService.getAuthHeader() }),
-  getDataset: (id) => safeFetch(`/api/datasets/${id}`, { headers: authService.getAuthHeader() }),
-  createDataset: (data) => {
-    const headers = {
-      'Content-Type': 'application/json',
-      ...authService.getAuthHeader()
-    };
-    return safeFetch('/api/datasets', { method: 'POST', headers, body: JSON.stringify(data) });
-  },
-  updateDataset: (id, data) => {
-    const headers = {
-      'Content-Type': 'application/json',
-      ...authService.getAuthHeader()
-    };
-    return safeFetch(`/api/datasets/${id}`, { method: 'PUT', headers, body: JSON.stringify(data) });
-  },
-  deleteDataset: (id) => safeFetch(`/api/datasets/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
 
   // Images
   getImages: (params) => {
@@ -186,10 +165,6 @@ export const authenticatedApi = {
     return safeFetch(`/api/images${query ? `?${query}` : ''}`, { headers: authService.getAuthHeader() });
   },
   getImage: (id) => safeFetch(`/api/images/${id}`, { headers: authService.getAuthHeader() }),
-  getImageAnnotations: (id, params) => {
-    const query = new URLSearchParams(params).toString();
-    return safeFetch(`/api/annotations?imageId=${id}${query ? `&${query}` : ''}`, { headers: authService.getAuthHeader() });
-  },
   deleteImage: (id) => safeFetch(`/api/images/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
 
   // Annotations
@@ -213,18 +188,6 @@ export const authenticatedApi = {
     return safeFetch(`/api/annotations/${id}`, { method: 'PUT', headers, body: JSON.stringify(data) });
   },
   deleteAnnotation: (id) => safeFetch(`/api/annotations/${id}`, { method: 'DELETE', headers: authService.getAuthHeader() }),
-
-  // Upload
-  uploadImage: (file, datasetId) => {
-    const formData = new FormData();
-    formData.append('image', file);
-    if (datasetId) formData.append('datasetId', datasetId);
-    const headers = authService.getAuthHeader();
-    return safeFetch('/api/upload', { method: 'POST', body: formData, headers });
-  },
-
-  // Stats
-  getStats: () => safeFetch('/api/images/stats', { headers: authService.getAuthHeader() }),
 };
 
 // Test injection exports

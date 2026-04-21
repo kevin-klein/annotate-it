@@ -23,8 +23,8 @@ const ProjectView = ({ onBackToProjects }) => {
 	);
 
 	useEffect(() => {
-		if (projectResponse?.project) {
-			setProjectData(projectResponse.project);
+		if (projectResponse) {
+			setProjectData(projectResponse);
 		}
 	}, [projectResponse]);
 
@@ -44,7 +44,7 @@ const ProjectView = ({ onBackToProjects }) => {
 		api.fetcher,
 	);
 
-	const annotations = annotationsData?.annotations || [];
+	const annotations = annotationsData || [];
 
 	const performImageSelect = useCallback(
 		(image) => {
@@ -116,18 +116,20 @@ const ProjectView = ({ onBackToProjects }) => {
 					selectedProjectId={projectId}
 					selectedImage={selectedImage}
 					onSelectImage={handleImageSelect}
+				mutateImages={mutateImages}
 				/>
 				{selectedImage ? (
 					<Canvas
 						selectedImage={selectedImage}
 						selectedProjectId={projectId}
-						activeAnnotationType={projectData?.type}
+						activeAnnotationType={projectData?.annotation_type}
 						onTypeChange={() => {}}
 						projectLabels={projectData?.labels || []}
 						annotations={annotations}
 						onAnnotationsSaved={handleAnnotationSave}
 						onSaveStatusChange={handleSaveStatusChange}
 						saveFnRef={saveFnRef}
+						mutateImages={mutateImages}
 					/>
 				) : (
 					<div className="main-content-empty">

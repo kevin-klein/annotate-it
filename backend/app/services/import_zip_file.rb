@@ -42,11 +42,14 @@ class ImportZipFile
 
     parser.parse(annotation_entry.data).each do |annotation|
       label = find_or_create_label(project, annotation.label)
-      image.annotations.create!(data: annotation.points, label: label)
+      ann = image.annotations.create!(label: label)
+      ann.data = annotation.points
     end
   end
 
   def find_or_create_label(project, label_name)
     project.labels.find_or_create_by(name: label_name)
+  rescue ActiveRecord::RecordNotUnique
+    project.labels.find_by(name: label_name)
   end
 end

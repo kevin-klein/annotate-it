@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_101543) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_194400) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -41,7 +41,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_101543) do
 
   create_table "annotations", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.json "data"
     t.integer "image_id", null: false
     t.integer "label_id", null: false
     t.datetime "updated_at", null: false
@@ -49,13 +48,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_101543) do
     t.index ["label_id"], name: "index_annotations_on_label_id"
   end
 
+  create_table "contrastive_learning_annotations", force: :cascade do |t|
+    t.integer "annotation_id", null: false
+    t.json "contrastive_points", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["annotation_id"], name: "index_contrastive_learning_annotations_on_annotation_id"
+  end
+
   create_table "images", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.boolean "finished", default: false, null: false
     t.integer "height"
     t.integer "project_id", null: false
     t.datetime "updated_at", null: false
     t.integer "width"
     t.index ["project_id"], name: "index_images_on_project_id"
+  end
+
+  create_table "instance_segmentation_annotations", force: :cascade do |t|
+    t.integer "annotation_id", null: false
+    t.datetime "created_at", null: false
+    t.json "points", null: false
+    t.datetime "updated_at", null: false
+    t.index ["annotation_id"], name: "index_instance_segmentation_annotations_on_annotation_id"
   end
 
   create_table "labels", force: :cascade do |t|
@@ -64,7 +80,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_101543) do
     t.string "name"
     t.integer "project_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["project_id", "name"], name: "index_labels_on_project_id_and_name", unique: true
     t.index ["project_id"], name: "index_labels_on_project_id"
+  end
+
+  create_table "object_detection_annotations", force: :cascade do |t|
+    t.integer "annotation_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "xmax", null: false
+    t.decimal "xmin", null: false
+    t.decimal "ymax", null: false
+    t.decimal "ymin", null: false
+    t.index ["annotation_id"], name: "index_object_detection_annotations_on_annotation_id"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -77,7 +105,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_101543) do
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "email"
+    t.text "email"
     t.string "login_code"
     t.datetime "login_code_expiry"
     t.datetime "updated_at", null: false
@@ -88,6 +116,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_101543) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "annotations", "images"
   add_foreign_key "annotations", "labels"
+  add_foreign_key "contrastive_learning_annotations", "annotations"
   add_foreign_key "images", "projects"
+  add_foreign_key "instance_segmentation_annotations", "annotations"
   add_foreign_key "labels", "projects"
+  add_foreign_key "object_detection_annotations", "annotations"
 end

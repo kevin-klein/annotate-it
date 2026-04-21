@@ -74,13 +74,13 @@ describe("ProjectSelection", () => {
 			{
 				id: 1,
 				name: "Project A",
-				type: "object_detection",
+				annotation_type: "object_detection",
 				description: "Desc A",
 			},
 			{
 				id: 2,
 				name: "Project B",
-				type: "instance_segmentation",
+				annotation_type: "instance_segmentation",
 				description: "Desc B",
 			},
 		];
@@ -96,7 +96,7 @@ describe("ProjectSelection", () => {
 	});
 
 	test("renders project type labels", () => {
-		const mockProjects = [{ id: 1, name: "Test", type: "object_detection" }];
+		const mockProjects = [{ id: 1, name: "Test", annotation_type: "object_detection" }];
 		useSWR.mockReturnValue({
 			data: mockProjects,
 			mutate: jest.fn(),
@@ -108,7 +108,7 @@ describe("ProjectSelection", () => {
 	});
 
 	test("renders settings button for each project", () => {
-		const mockProjects = [{ id: 1, name: "Test", type: "object_detection" }];
+		const mockProjects = [{ id: 1, name: "Test", annotation_type: "object_detection" }];
 		useSWR.mockReturnValue({
 			data: mockProjects,
 			mutate: jest.fn(),
@@ -131,7 +131,7 @@ describe("ProjectSelection", () => {
 	});
 
 	test("renders New Project button when projects exist", () => {
-		const mockProjects = [{ id: 1, name: "Test", type: "object_detection" }];
+		const mockProjects = [{ id: 1, name: "Test", annotation_type: "object_detection" }];
 		useSWR.mockReturnValue({
 			data: mockProjects,
 			mutate: jest.fn(),
@@ -241,10 +241,7 @@ describe("ProjectSelection", () => {
 	});
 
 	test("calls api.post when Create Project is submitted with valid data", async () => {
-		authenticatedApi.post.mockResolvedValue({
-			success: true,
-			project: { id: 99 },
-		});
+		authenticatedApi.post.mockResolvedValue({ id: 99 });
 		useSWR.mockReturnValue({
 			data: [],
 			mutate: jest.fn(),
@@ -276,7 +273,7 @@ describe("ProjectSelection", () => {
 			{
 				id: 1,
 				name: "Test",
-				type: "object_detection",
+				annotation_type: "object_detection",
 				description: "A great project",
 			},
 		];
@@ -292,7 +289,7 @@ describe("ProjectSelection", () => {
 
 	test("renders correct icon for instance_segmentation", () => {
 		const mockProjects = [
-			{ id: 1, name: "Seg", type: "instance_segmentation" },
+			{ id: 1, name: "Seg", annotation_type: "instance_segmentation" },
 		];
 		useSWR.mockReturnValue({
 			data: mockProjects,
@@ -306,7 +303,7 @@ describe("ProjectSelection", () => {
 
 	test("renders correct icon for contrastive_learning", () => {
 		const mockProjects = [
-			{ id: 1, name: "Contrast", type: "contrastive_learning" },
+			{ id: 1, name: "Contrast", annotation_type: "contrastive_learning" },
 		];
 		useSWR.mockReturnValue({
 			data: mockProjects,

@@ -1,6 +1,6 @@
 class ImportZipFile
   def initialize
-    @temp_dir = Rails.root.join('tmp')
+    @temp_dir = Rails.root.join("tmp")
     @zip_extractor = ZipFileExtractor.new
     @parser = PascalVocParser.new
     @image_creator = ImageCreator.new
@@ -8,12 +8,12 @@ class ImportZipFile
 
   def run(project, file)
     temp_path = extract_temp_file(file.read)
-    
+
     entries, warnings = @zip_extractor.extract(temp_path)
-    
+
     import_entries(project, entries, warnings)
 
-    { warnings: warnings }
+    {warnings: warnings}
   end
 
   private
@@ -30,8 +30,10 @@ class ImportZipFile
     Image.transaction do
       entries.select(&:image?).each do |image_entry|
         annotation_entry = zip_extractor.annotation_for_image(entries, image_entry)
-    
-        image = image_creator.create(project, image_entry.data)
+
+        ap image_entry.name
+        ap annotation_entry
+        image = image_creator.create(project, image_entry.data, image_entry.name)
         save_annotations(project, image, annotation_entry)
       end
     end
@@ -42,8 +44,12 @@ class ImportZipFile
 
     parser.parse(annotation_entry.data).each do |annotation|
       label = find_or_create_label(project, annotation.label)
+      # xs = annotation.points.map { _1[0] }
+      # ys = annotation.points.map { _1[1] }
+
       ann = image.annotations.create!(label: label)
       ann.data = annotation.points
+      ann.save!
     end
   end
 

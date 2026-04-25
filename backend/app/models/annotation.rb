@@ -16,7 +16,7 @@ class Annotation < ApplicationRecord
     return unless type
     case type
     when "object_detection"
-      self.object_detection_annotation ||= ObjectDetectionAnnotation.new(annotation: self)
+      self.object_detection_annotation ||= ObjectDetectionAnnotation.new(annotation: self, xmax: 0, ymax: 0, xmin: 0, ymin: 0)
     when "instance_segmentation"
       self.instance_segmentation_annotation ||= InstanceSegmentationAnnotation.new(annotation: self)
     when "contrastive_learning"
@@ -55,6 +55,7 @@ class Annotation < ApplicationRecord
           xmax: value.map { |p| p[0] }.max,
           ymax: value.map { |p| p[1] }.max
         )
+        ap value
       else
         raise
       end

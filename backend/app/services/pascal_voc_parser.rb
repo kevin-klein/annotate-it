@@ -8,7 +8,7 @@ class PascalVocParser
     end
 
     def to_h
-      { label: label, data: points }
+      {label: label, data: points}
     end
   end
 
@@ -16,7 +16,7 @@ class PascalVocParser
     return [] unless xml_data.present?
 
     doc = Nokogiri::XML(xml_data)
-    objects = doc.xpath('//object')
+    objects = doc.xpath("//object")
 
     objects.map do |object_node|
       parse_object(object_node)
@@ -36,18 +36,18 @@ class PascalVocParser
   end
 
   def extract_label(object_node)
-    object_node.at_xpath('name')&.text&.strip
+    object_node.at_xpath("name")&.text&.strip
   end
 
   def extract_bounding_box(object_node)
-    bndbox = object_node.at_xpath('bndbox')
+    bndbox = object_node.at_xpath("bndbox")
     return nil unless bndbox
 
     {
-      xmin: extract_coordinate(bndbox, 'xmin'),
-      ymin: extract_coordinate(bndbox, 'ymin'),
-      xmax: extract_coordinate(bndbox, 'xmax'),
-      ymax: extract_coordinate(bndbox, 'ymax')
+      xmin: extract_coordinate(bndbox, "xmin"),
+      ymin: extract_coordinate(bndbox, "ymin"),
+      xmax: extract_coordinate(bndbox, "xmax"),
+      ymax: extract_coordinate(bndbox, "ymax")
     }
   end
 

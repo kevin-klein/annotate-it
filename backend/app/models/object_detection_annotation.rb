@@ -2,7 +2,7 @@ class ObjectDetectionAnnotation < ApplicationRecord
   belongs_to :annotation
 
   validates :xmin, :ymin, :xmax, :ymax, presence: true
-  validate :coordinates_must_form_valid_box
+  # validate :coordinates_must_form_valid_box
 
   private
 

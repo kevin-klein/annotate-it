@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import UploadModal from './UploadModal';
-import { authenticatedApi as api } from '../services/auth';
+import { authenticatedApi as api, authService } from '../services/auth';
 
 const ImageList = ({ images, selectedImage, onSelectImage, filter }) => {
   const filteredImages = images.filter((image) => {
@@ -153,6 +153,8 @@ const Sidebar = ({ activeView, selectedProjectId, selectedImage, onSelectImage, 
     });
 
     xhr.open('POST', '/api/images');
+    xhr.setRequestHeader("Authorization", authService.getAuthHeader().Authorization)
+
     xhr.send(formData);
   };
 

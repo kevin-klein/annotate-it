@@ -20,3 +20,5 @@ node_modules
 
 # Pi project-local packages (if using pi install -l)
 .pi/npm/
+
+backend/config/credentials.yml.enc

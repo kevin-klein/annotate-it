@@ -30,8 +30,8 @@ class AnnotationExporter
             xml.difficult(0)
             xml.occluded(0)
             xml.bndbox do
-              xs = points.map(_1[0])
-              ys = points.map(_1[1])
+              xs = points.map { _1[0] }
+              ys = points.map { _1[1] }
 
               xml.xmin(xs.min)
               xml.xmax(xs.max)

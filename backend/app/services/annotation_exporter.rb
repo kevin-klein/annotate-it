@@ -11,7 +11,7 @@ class AnnotationExporter
         'xsi:noNamespaceSchemaLocation' => 'annotation.xsd'
       ) do
         xml.folder('project')
-        xml.filename(File.basename(annotation.image.image.original_filename))
+        xml.filename(File.basename(annotation.image.image.attachment.blob.filename.to_s))
         xml.source do
           xml.database('AnnotationDB')
         end
